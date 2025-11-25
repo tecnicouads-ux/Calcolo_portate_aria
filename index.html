@@ -188,10 +188,10 @@ input:focus, select:focus {
   margin-left: 6px;
 }
 
-.tag-ok { background:#22c55e33; color:#22c55e; }
+.tag-ok  { background:#22c55e33; color:#22c55e; }
 .tag-low { background:#3b82f630; color:#3b82f6; }
-.tag-high { background:#f9731630; color:#fb923c; }
-.tag-na { background:#6b728033; color:#6b7280; }
+.tag-high{ background:#f9731630; color:#fb923c; }
+.tag-na  { background:#6b728033; color:#6b7280; }
 
 /* -------------------------------------------------------------
    SUGGERIMENTO — MULTILINEA
@@ -223,9 +223,7 @@ input:focus, select:focus {
   </div>
 </header>
 
-<!-- -------------------------------------------------------------
-     INPUT
-------------------------------------------------------------- -->
+<!-- INPUT -->
 <div class="card">
   <h2>Input</h2>
 
@@ -266,9 +264,7 @@ input:focus, select:focus {
   <button class="btn-primary" onclick="calcola()">Calcola</button>
 </div>
 
-<!-- -------------------------------------------------------------
-     RISULTATI
-------------------------------------------------------------- -->
+<!-- RISULTATI -->
 <div class="card">
   <h2>Risultati</h2>
 
@@ -327,9 +323,7 @@ input:focus, select:focus {
 
 </div>
 
-<!-- -------------------------------------------------------------
-     SUGGERIMENTO UNI
-------------------------------------------------------------- -->
+<!-- SUGGERIMENTO -->
 <div class="card" id="suggestCard" style="display:none;">
   <h2>Suggerimento</h2>
   <div class="twoLine">
@@ -337,7 +331,6 @@ input:focus, select:focus {
     <span class="value" id="suggText">—</span>
   </div>
 </div>
-
 
 <script>
 function byId(i){return document.getElementById(i);}
@@ -388,7 +381,7 @@ function getTag(v,min,max){
 /* CALCOLO */
 function calcola(){
   const Q=parseFloat(byId("flow").value);
-  const V=parseFloat(byId("velocity").value);
+  const V_in=parseFloat(byId("velocity").value);
   const geom=byId("geom").value;
   const scen=scenarios[byId("scenario").value];
 
@@ -397,23 +390,53 @@ function calcola(){
 
   let A=null,v=null;
 
+  // reset elementi che possono rimanere da calcoli precedenti
+  byId("circOut").style.display="none";
+  byId("rectSquareRow").style.display="none";
+  byId("rectSquareOut").textContent="—";
+  byId("suggText").textContent="—";
+  byId("suggestCard").style.display="none";
+
   /* RETTANGOLARE */
   if(geom==="rect"){
     const bMm=parseFloat(byId("base").value);
     const hMm=parseFloat(byId("height").value);
-    const b=bMm?bMm/1000:null;
-    const h=hMm?hMm/1000:null;
+    let b=bMm?bMm/1000:null;
+    let h=hMm?hMm/1000:null;
 
-    if(V){
-      A=Qs/V; v=V;
-      if(!b&&!h){
-        const s=Math.sqrt(A)*1000;
+    const hasB=!!b;
+    const hasH=!!h;
+
+    if(V_in){  // abbiamo velocità: usiamola per fissare l'area
+      A=Qs/V_in;
+      v=V_in;
+
+      if(hasB && !hasH){
+        // calcolo altezza mancante
+        h=A/b;
+        byId("height").value=round(h*1000,1);
+      } else if(!hasB && hasH){
+        // calcolo base mancante
+        b=A/h;
+        byId("base").value=round(b*1000,1);
+      } else if(!hasB && !hasH){
+        // nessuna dimensione data → sezione quadrata
+        const side=Math.sqrt(A)*1000;
         byId("rectSquareRow").style.display="";
-        byId("rectSquareOut").textContent=round(s,1)+" mm";
+        byId("rectSquareOut").textContent=round(side,1)+" mm";
+      } else {
+        // base e altezza entrambe inserite → ricalcolo la velocità reale
+        A=b*h;
+        v=Qs/A;
       }
     } else {
-      if(!b||!h){alert("Se V è sconosciuta, inserire base e altezza.");return;}
-      A=b*h; v=Qs/A;
+      // velocità non nota: usiamo solo le dimensioni per calcolarla
+      if(!hasB || !hasH){
+        alert("Se la velocità non è nota, inserisci sia base che altezza.");
+        return;
+      }
+      A=b*h;
+      v=Qs/A;
     }
   }
 
@@ -422,19 +445,21 @@ function calcola(){
     const dMm=parseFloat(byId("diam").value);
     const hasD=dMm>0;
 
-    if(V){
-      A=Qs/V; v=V;
+    if(V_in){
+      A=Qs/V_in;
+      v=V_in;
     } else {
-      if(!hasD){alert("Se V è sconosciuta, inserire diametro.");return;}
+      if(!hasD){alert("Se V è sconosciuta, inserisci diametro.");return;}
       const d=dMm/1000;
-      A=Math.PI*d*d/4; v=Qs/A;
+      A=Math.PI*d*d/4; 
+      v=Qs/A;
     }
 
     byId("circOut").style.display="";
     const side=Math.sqrt(A)*1000;
     byId("squareSideOut").textContent=round(side,1)+" mm";
 
-    if(V && !hasD){
+    if(V_in && !hasD){
       const Deq=Math.sqrt(4*A/Math.PI)*1000;
       let best=null,min=1e9;
       for(const dn of stdDiameters){
@@ -448,7 +473,7 @@ function calcola(){
 
   if(!A||!v){alert("Errore.");return;}
 
-  /* RISULTATI */
+  /* RISULTATI PRINCIPALI */
   byId("areaOut").textContent=round(A,4)+" m² ("+round(A*1e6)+" mm²)";
   byId("vEffOut").textContent=round(v,2)+" m/s";
 
@@ -469,18 +494,25 @@ function calcola(){
       byId("stdDNOut").textContent="DN "+best+" mm";
       const Astd=Math.PI*(best/1000)**2/4;
       byId("stdDNVOut").textContent=round(Qs/Astd,2)+" m/s";
+    } else {
+      byId("stdDNOut").textContent="—";
+      byId("stdDNVOut").textContent="—";
     }
+  } else {
+    byId("deqOut").textContent="—";
+    byId("stdDNOut").textContent="—";
+    byId("stdDNVOut").textContent="—";
   }
 
-  /* SUGGERIMENTO */
+  /* SUGGERIMENTO UNI */
   if(scen.vMax!=null && v>scen.vMax){
     const vT=(scen.vMin+scen.vMax)/2;
     const Anew=Qs/vT;
 
     if(geom==="rect"){
-      const s=Math.sqrt(Anew)*1000;
+      const side=Math.sqrt(Anew)*1000;
       byId("suggText").textContent=
-        "Velocità troppo alta. Sezione consigliata ~ "+round(s,1)+" × "+round(s,1)+" mm.";
+        "Velocità troppo alta. Sezione consigliata ~ "+round(side,1)+" × "+round(side,1)+" mm.";
     } else {
       const Deq=Math.sqrt(4*Anew/Math.PI)*1000;
       let best=null,min=1e9;
@@ -493,8 +525,6 @@ function calcola(){
         "Velocità troppo alta. Suggerito DN "+best+" mm (V≈"+round(v2,2)+" m/s).";
     }
     byId("suggestCard").style.display="";
-  } else {
-    byId("suggestCard").style.display="none";
   }
 }
 </script>
