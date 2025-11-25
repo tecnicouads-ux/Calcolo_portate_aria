@@ -63,42 +63,42 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER COMPATTO + LOGO 80PX
+   HEADER COMPATTO + LOGO 80PX (STILE A)
 ------------------------------------------------------------- */
 header {
   background: var(--bg-elevated);
-  padding: 6px 10px;            
-  border-radius: 14px;
-  box-shadow: 0 8px 18px var(--shadow-header);
+  padding: 4px 8px;
+  border-radius: 12px;
+  box-shadow: 0 6px 14px var(--shadow-header);
   border: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  min-height: 70px;             
+  gap: 8px;
+  margin-bottom: 12px;
+  min-height: 60px;
 }
 
 .app-logo {
   width: 80px;
   height: 80px;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 10px;
   flex-shrink: 0;
   margin: 0;
 }
 
 .app-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
-  line-height: 1;                
-  margin-bottom: 4px;
+  line-height: 1.0;
+  margin-bottom: 3px;
 }
 
 .app-subtitle {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
   margin-top: 0;
-  line-height: 1.1;
+  line-height: 1.0;
 }
 
 /* -------------------------------------------------------------
@@ -120,7 +120,7 @@ header {
 }
 
 /* -------------------------------------------------------------
-   INPUT
+   INPUT & SELECT (STESSA LARGHEZZA)
 ------------------------------------------------------------- */
 label {
   font-size: 14px;
@@ -130,7 +130,8 @@ label {
 }
 
 input, select {
-  width: 100%;
+  width: 100% !important;
+  box-sizing: border-box;
   font-size: 15px;
   padding: 7px 10px;
   border-radius: 10px;
@@ -228,7 +229,7 @@ input:focus, select:focus {
 <body>
 <div class="app">
 
-<!-- HEADER CON LINK -->
+<!-- HEADER CON LINK AL SITO ADS -->
 <a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
 <header>
   <img src="logo.png" alt="Logo" class="app-logo">
