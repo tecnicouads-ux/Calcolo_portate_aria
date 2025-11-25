@@ -205,6 +205,14 @@
     </div>
   </div>
 
+  <!-- SUGGERIMENTO -->
+  <div class="card" id="suggestCard" style="display:none;">
+    <h2>Suggerimento</h2>
+    <div class="results">
+      <div id="suggText">—</div>
+    </div>
+  </div>
+
   <!-- CONVERSIONI -->
   <div class="card">
     <h2>Conversioni</h2>
@@ -240,7 +248,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   function updateScenarioInfo(){
     const s=scenarios[scenSel.value];
     if(s.vMin!=null){
-      scenInfo.textContent="Range consigliato: "+s.vMin+" – "+s.vMax+" m/s";
+      scenInfo.textContent="Range consigliato: "+s.vMin+" – "+s.vMax+" m/s (UNI 10339 / UNI EN 16798-3)";
     }else{
       scenInfo.textContent="Nessun limite impostato";
     }
@@ -283,6 +291,8 @@ function calcola(){
   const circDNVOut=byId("circDNVOut");
   const rectSquareRow=byId("rectSquareRow");
   const rectSquareOut=byId("rectSquareOut");
+  const suggestCard=byId("suggestCard");
+  const suggText=byId("suggText");
 
   circOut.style.display="none";
   vEffTagEl.textContent="n/d";
@@ -291,6 +301,8 @@ function calcola(){
   circDNVOut.textContent="—";
   rectSquareRow.style.display="none";
   rectSquareOut.textContent="—";
+  suggestCard.style.display="none";
+  suggText.textContent="—";
 
   if(!Q || Q<=0){
     alert("Inserisci portata Q > 0");
@@ -310,11 +322,11 @@ function calcola(){
     const h=heightMm ? heightMm/1000 : null;
 
     if(V_input && V_input>0){
-      // Dimensionamento: Q + V -> A (base/altezza opzionali)
+      // Dimensionamento: Q + V -> A
       A=Qs/V_input;
       vEff=V_input;
 
-      // Se NON inserisco né base né altezza -> mostra lato quadrato equivalente
+      // Se non inserisco base/altezza -> sezione quadrata equivalente
       if(!b && !h){
         const side_m=Math.sqrt(A);
         const side_mm=side_m*1000;
@@ -426,6 +438,41 @@ function calcola(){
     byId("deqOut").textContent="—";
     byId("stdDNOut").textContent="—";
     byId("stdDNVOut").textContent="—";
+  }
+
+  // SUGGERIMENTO se velocità alta rispetto allo scenario
+  if(scen.vMax!=null && vEff>scen.vMax){
+    const vTarget = scen.vMin!=null ? (scen.vMin+scen.vMax)/2 : scen.vMax;
+    if(geom==="rect"){
+      const Anew = Qs / vTarget;
+      const side_m = Math.sqrt(Anew);
+      const side_mm = side_m*1000;
+      suggText.textContent =
+        "Velocità risultante alta per lo scenario selezionato. " +
+        "Per rientrare nei range tipici UNI, puoi usare una sezione quadrata circa " +
+        round(side_mm,1) + " × " + round(side_mm,1) + " mm, con V ≈ " +
+        round(vTarget,2) + " m/s.";
+    }else if(geom==="circ"){
+      const Anew = Qs / vTarget;
+      const Deq_new_mm = Math.sqrt(4*Anew/Math.PI)*1000;
+      let best=null,minDiff=1e9;
+      for(const dn of stdDiameters){
+        const diff=Math.abs(dn-Deq_new_mm);
+        if(diff<minDiff){
+          minDiff=diff;
+          best=dn;
+        }
+      }
+      if(best){
+        const Astd=Math.PI*(best/1000)**2/4;
+        const Vstd=Qs/Astd;
+        suggText.textContent =
+          "Velocità risultante alta per lo scenario selezionato. " +
+          "Per rientrare nei range tipici UNI, puoi usare un canale circolare DN " +
+          best + " mm, con V ≈ " + round(Vstd,2) + " m/s.";
+      }
+    }
+    suggestCard.style.display="";
   }
 }
 </script>
