@@ -132,16 +132,15 @@
   <div class="card">
     <h2>Input principali</h2>
     <div class="note">
-      1) Inserisci portata e velocità.<br>
-      2) Scegli scenario e tipo sezione.<br>
-      3) Se vuoi, inserisci base/altezza o diametro esistente.
+      • Se conosci Q e V, dimensioni la sezione.<br>
+      • Se NON conosci V, inserisci Q + dimensioni canale, e calcolo io V reale.
     </div>
 
     <label>Portata Q (m³/h)</label>
     <input id="flow" type="number" placeholder="es. 1200">
 
-    <label>Velocità V (m/s) (obiettivo)</label>
-    <input id="velocity" type="number" placeholder="es. 4">
+    <label>Velocità V (m/s) (opzionale)</label>
+    <input id="velocity" type="number" placeholder="es. 4 (lascia vuoto se non la sai)">
 
     <label>Scenario impianto (limiti velocità)</label>
     <select id="scenario">
@@ -163,25 +162,26 @@
     <div id="rect_fields">
       <div class="row-2">
         <div>
-          <label>Base nota (mm) (opzionale)</label>
+          <label>Base (mm)</label>
           <input id="base" type="number" placeholder="es. 400">
         </div>
         <div>
-          <label>Altezza nota (mm) (opzionale)</label>
+          <label>Altezza (mm)</label>
           <input id="height" type="number" placeholder="es. 200">
         </div>
       </div>
       <div class="note">
-        Puoi inserire solo base o solo altezza: l'altra viene calcolata dall'area richiesta.
+        • Se V è nota: puoi inserire solo base o solo altezza, e calcolo l'altra.<br>
+        • Se V è vuota: DEVI inserire sia base che altezza (canale esistente).
       </div>
     </div>
 
     <div id="circ_fields" style="display:none;">
-      <label>Diametro esistente (mm) (opzionale)</label>
+      <label>Diametro (mm)</label>
       <input id="diam" type="number" placeholder="es. 250">
       <div class="note">
-        Se non inserisci il diametro, ti calcolo quello necessario per Q e V.<br>
-        Se lo inserisci, ti mostro la velocità reale e il lato di un quadrato equivalente.
+        • Se V è nota: se lasci vuoto, calcolo il diametro richiesto; se lo metti, confronto.<br>
+        • Se V è vuota: devi inserire il diametro del canale esistente, calcolo V reale.
       </div>
     </div>
 
@@ -192,16 +192,19 @@
   <div class="card">
     <h2>Risultati principali</h2>
     <div class="results">
-      <div>Area richiesta A: <span id="areaOut">—</span></div>
+      <div>Area A: <span id="areaOut">—</span></div>
+      <div>Velocità considerata V: <span id="vEffOut">—</span>
+        <span id="vEffTag" class="tag tag-na">n/d</span>
+      </div>
+      <div>Diametro equivalente Deq (da A): <span id="deqOut">—</span></div>
 
       <div id="rectOut" style="display:none;">
         <div>Base risultante: <span id="baseOut">—</span></div>
         <div>Altezza risultante: <span id="heightOut">—</span></div>
-        <div>Diametro equivalente (area A): <span id="deqRectOut">—</span></div>
       </div>
 
       <div id="circOut" style="display:none;">
-        <div>Diametro richiesto (Q,V): <span id="dReqOut">—</span></div>
+        <div>Diametro richiesto (se V nota): <span id="dReqOut">—</span></div>
         <div>Diametro inserito: <span id="dInsOut">—</span></div>
         <div>Velocità reale con diam. inserito:
           <span id="vRealOut">—</span>
@@ -212,38 +215,23 @@
     </div>
   </div>
 
-  <!-- CONTROLLO VELOCITÀ -->
-  <div class="card">
-    <h2>Controllo velocità (scenario)</h2>
-    <div class="results">
-      <div>
-        Velocità obiettivo V:
-        <span id="vObjOut">—</span>
-        <span id="vObjTag" class="tag tag-na">n/d</span>
-      </div>
-      <div>
-        Range consigliato scenario:
-        <span id="rangeOut">—</span>
-      </div>
-    </div>
-    <div class="note">
-      Legenda: <span class="tag tag-low">Bassa</span>
-      <span class="tag tag-ok">OK</span>
-      <span class="tag tag-high">Alta</span>
-    </div>
-  </div>
-
   <!-- SUGGERIMENTO DIAMETRI STANDARD -->
   <div class="card">
-    <h2>Suggerimento diametri standard</h2>
+    <h2>Diametri standard rispetto a Deq</h2>
     <div class="note">
-      Si usa la portata Q e il limite superiore di velocità dello scenario (quando presente).
-      Se non c'è scenario, si usa la velocità obiettivo V.
+      Diametro equivalente viene confrontato con diametri standard (DN).
+      Viene proposto il DN più vicino e la velocità con quella sezione.
     </div>
     <div class="results">
-      <div>Diametro standard suggerito: <span id="stdDiamOut">—</span></div>
-      <div>Velocità con diametro suggerito: <span id="stdDiamVOut">—</span></div>
-      <div>Diametri standard considerati DN: <span id="stdListOut"></span></div>
+      <div>Deq calcolato: <span id="deqStdBaseOut">—</span></div>
+      <div>DN standard più vicino: <span id="stdDiamOut">—</span></div>
+      <div>Velocità con quel DN: <span id="stdDiamVOut">—</span></div>
+      <div>Tabella vel. per DN (m/s):<br>
+        <span id="stdTableOut" style="font-size:0.8rem;">—</span>
+      </div>
+      <div>Diametri standard usati (mm):<br>
+        <span id="stdListOut" style="font-size:0.8rem;"></span>
+      </div>
     </div>
   </div>
 
@@ -253,7 +241,7 @@
     <div class="results">
       <div>Q in m³/s: <span id="qM3sOut">—</span></div>
       <div>A in cm²: <span id="areaCm2Out">—</span></div>
-      <div>V in km/h (obiettivo): <span id="vKmhOut">—</span></div>
+      <div>V in km/h: <span id="vKmhOut">—</span></div>
     </div>
   </div>
 
@@ -271,6 +259,7 @@ const scenarios = {
   none:     { name: "Nessun limite",             vMin: null, vMax: null }
 };
 
+// elenco diametri standard
 const stdDiameters = [80, 100, 125, 140, 150, 160, 180, 200, 224, 250, 280, 300, 315, 355, 400, 450, 500, 560, 600];
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -321,153 +310,209 @@ function getVelocityTag(v, vMin, vMax) {
 
 function calcola() {
   const Q = parseFloat(document.getElementById("flow").value);
-  const V = parseFloat(document.getElementById("velocity").value);
+  const V_input = parseFloat(document.getElementById("velocity").value);
   const geom = document.getElementById("geom").value;
   const scenKey = document.getElementById("scenario").value;
   const scen = scenarios[scenKey];
 
-  const areaOut = document.getElementById("areaOut");
   const rectOut = document.getElementById("rectOut");
   const circOut = document.getElementById("circOut");
+  const vEffTagEl = document.getElementById("vEffTag");
+  const vRealTagEl = document.getElementById("vRealTag");
 
   rectOut.style.display = "none";
   circOut.style.display = "none";
+  vEffTagEl.textContent = "n/d";
+  vEffTagEl.className = "tag tag-na";
+  vRealTagEl.textContent = "n/d";
+  vRealTagEl.className = "tag tag-na";
 
-  if (!Q || !V || Q <= 0 || V <= 0) {
-    alert("Inserisci portata Q > 0 e velocità V > 0");
+  if (!Q || Q <= 0) {
+    alert("Inserisci portata Q > 0");
     return;
   }
 
-  // Area richiesta [m²]
-  const A = (Q / 3600) / V;
-  areaOut.textContent = round(A, 4) + " m²";
+  // variabili comuni
+  let A = null;        // area m²
+  let vEff = null;     // velocità effettiva usata per controlli
+  let Deq_mm = null;   // diametro equivalente da A
 
-  // Conversioni
-  document.getElementById("qM3sOut").textContent = round(Q / 3600, 4);
-  document.getElementById("areaCm2Out").textContent = round(A * 10000, 1); // 1 m² = 10.000 cm²
-  document.getElementById("vKmhOut").textContent = round(V * 3.6, 2) + " km/h";
+  const Q_m3s = Q / 3600;
 
-  // Controllo velocità obiettivo
-  document.getElementById("vObjOut").textContent = round(V, 2) + " m/s";
-  const vObjTag = getVelocityTag(V, scen.vMin, scen.vMax);
-  const vObjTagEl = document.getElementById("vObjTag");
-  vObjTagEl.textContent = vObjTag.text;
-  vObjTagEl.className = "tag " + vObjTag.cls;
-
-  if (scen.vMin != null && scen.vMax != null) {
-    document.getElementById("rangeOut").textContent =
-      scen.vMin + " – " + scen.vMax + " m/s";
-  } else {
-    document.getElementById("rangeOut").textContent = "Nessun limite preimpostato";
-  }
-
-  // Geometria rettangolare
+  // Rettangolare
   if (geom === "rect") {
-    rectOut.style.display = "";
-
     let baseMm = parseFloat(document.getElementById("base").value);
     let heightMm = parseFloat(document.getElementById("height").value);
-
     let baseM = baseMm ? baseMm / 1000 : null;
     let heightM = heightMm ? heightMm / 1000 : null;
 
-    if (baseM && !heightM) {
-      heightM = A / baseM;
-      heightMm = heightM * 1000;
-    } else if (!baseM && heightM) {
-      baseM = A / heightM;
-      baseMm = baseM * 1000;
-    } else if (!baseM && !heightM) {
-      baseMm = null;
-      heightMm = null;
+    if (V_input && V_input > 0) {
+      // MODALITÀ DIMENSIONAMENTO: Q + V -> A
+      A = Q_m3s / V_input;
+      vEff = V_input;
+
+      // se ho solo una dimensione, ricavo l'altra
+      if (baseM && !heightM) {
+        heightM = A / baseM;
+        heightMm = heightM * 1000;
+      } else if (!baseM && heightM) {
+        baseM = A / heightM;
+        baseMm = baseM * 1000;
+      }
+      // se nessuna dimensione, ok: ho solo A e Deq
+
+    } else {
+      // MODALITÀ VERIFICA: Q + sezione -> V
+      if (!baseM || !heightM) {
+        alert("Se la velocità non è nota, per sezione rettangolare devi inserire sia base che altezza.");
+        return;
+      }
+      A = baseM * heightM;
+      vEff = Q_m3s / A;
     }
 
+    rectOut.style.display = "";
     document.getElementById("baseOut").textContent =
       baseMm ? round(baseMm, 1) + " mm" : "—";
     document.getElementById("heightOut").textContent =
       heightMm ? round(heightMm, 1) + " mm" : "—";
 
-    const Deq_m = Math.sqrt((4 * A) / Math.PI);
-    const Deq_mm = Deq_m * 1000;
-    document.getElementById("deqRectOut").textContent =
-      round(Deq_mm, 1) + " mm";
   }
 
-  // Geometria circolare
+  // Circolare
   if (geom === "circ") {
+    let dInputMm = parseFloat(document.getElementById("diam").value);
+    let D_ins_m = dInputMm ? dInputMm / 1000 : null;
+
     circOut.style.display = "";
 
-    const dInputMm = parseFloat(document.getElementById("diam").value);
+    if (V_input && V_input > 0) {
+      // MODALITÀ DIMENSIONAMENTO: Q + V -> A -> D_req
+      A = Q_m3s / V_input;
+      vEff = V_input;
 
-    const D_req_m = Math.sqrt((4 * A) / Math.PI);
-    const D_req_mm = D_req_m * 1000;
-    document.getElementById("dReqOut").textContent =
-      round(D_req_mm, 1) + " mm";
+      const D_req_m = Math.sqrt(4 * A / Math.PI);
+      const D_req_mm = D_req_m * 1000;
+      document.getElementById("dReqOut").textContent = round(D_req_mm, 1) + " mm";
 
-    const vRealTagEl = document.getElementById("vRealTag");
+      if (dInputMm && dInputMm > 0) {
+        // confronto con diametro inserito
+        document.getElementById("dInsOut").textContent =
+          round(dInputMm, 1) + " mm";
 
-    if (dInputMm && dInputMm > 0) {
+        const A_ins = Math.PI * Math.pow(D_ins_m, 2) / 4;
+        const V_real = Q_m3s / A_ins;
+        document.getElementById("vRealOut").textContent =
+          round(V_real, 2) + " m/s";
+
+        const side_m = Math.sqrt(A_ins);
+        const side_mm = side_m * 1000;
+        document.getElementById("squareSideOut").textContent =
+          round(side_mm, 1) + " mm";
+
+        const vRealTag = getVelocityTag(V_real, scen.vMin, scen.vMax);
+        vRealTagEl.textContent = vRealTag.text;
+        vRealTagEl.className = "tag " + vRealTag.cls;
+      } else {
+        document.getElementById("dInsOut").textContent = "—";
+        document.getElementById("vRealOut").textContent = "—";
+        document.getElementById("squareSideOut").textContent = "—";
+      }
+
+    } else {
+      // MODALITÀ VERIFICA: Q + D -> A, V
+      if (!D_ins_m) {
+        alert("Se la velocità non è nota, per sezione circolare devi inserire il diametro.");
+        return;
+      }
+      const A_ins = Math.PI * Math.pow(D_ins_m, 2) / 4;
+      A = A_ins;
+      vEff = Q_m3s / A_ins;
+
+      document.getElementById("dReqOut").textContent = "— (V non nota)";
       document.getElementById("dInsOut").textContent =
         round(dInputMm, 1) + " mm";
-
-      const D_ins_m = dInputMm / 1000;
-      const A_ins = Math.PI * Math.pow(D_ins_m, 2) / 4;
-
-      const V_real = (Q / 3600) / A_ins;
       document.getElementById("vRealOut").textContent =
-        round(V_real, 2) + " m/s";
+        round(vEff, 2) + " m/s";
 
       const side_m = Math.sqrt(A_ins);
       const side_mm = side_m * 1000;
       document.getElementById("squareSideOut").textContent =
         round(side_mm, 1) + " mm";
 
-      const vRealTag = getVelocityTag(V_real, scen.vMin, scen.vMax);
+      const vRealTag = getVelocityTag(vEff, scen.vMin, scen.vMax);
       vRealTagEl.textContent = vRealTag.text;
       vRealTagEl.className = "tag " + vRealTag.cls;
-    } else {
-      document.getElementById("dInsOut").textContent = "—";
-      document.getElementById("vRealOut").textContent = "—";
-      document.getElementById("squareSideOut").textContent = "—";
-      vRealTagEl.textContent = "n/d";
-      vRealTagEl.className = "tag tag-na";
     }
   }
 
-  // Suggerimento diametri standard
-  let targetV = V;
-  if (scen.vMax != null) {
-    targetV = scen.vMax;
+  // Se ancora non ho A o vEff, non posso andare avanti
+  if (!A || !vEff || A <= 0 || vEff <= 0) {
+    alert("Impossibile determinare correttamente area e velocità. Controlla i dati.");
+    return;
   }
 
-  let stdDiamText = "—";
-  let stdVText = "—";
+  // Area e Deq (comuni)
+  document.getElementById("areaOut").textContent = round(A, 4) + " m²";
+  const Deq_m = Math.sqrt(4 * A / Math.PI);
+  Deq_mm = Deq_m * 1000;
+  document.getElementById("deqOut").textContent = round(Deq_mm, 1) + " mm";
+  document.getElementById("deqStdBaseOut").textContent = round(Deq_mm, 1) + " mm";
 
-  if (Q > 0 && targetV > 0) {
-    const A_needed = (Q / 3600) / targetV;
-    const D_needed_mm = Math.sqrt(4 * A_needed / Math.PI) * 1000;
+  // Velocità effettiva + tag rispetto scenario
+  document.getElementById("vEffOut").textContent = round(vEff, 2) + " m/s";
+  const vEffTag = getVelocityTag(vEff, scen.vMin, scen.vMax);
+  vEffTagEl.textContent = vEffTag.text;
+  vEffTagEl.className = "tag " + vEffTag.cls;
 
-    let chosen = null;
-    for (let i = 0; i < stdDiameters.length; i++) {
-      if (stdDiameters[i] >= D_needed_mm) {
-        chosen = stdDiameters[i];
-        break;
-      }
+  // Conversioni
+  document.getElementById("qM3sOut").textContent = round(Q_m3s, 4);
+  document.getElementById("areaCm2Out").textContent = round(A * 10000, 1); // 1 m² = 10.000 cm²
+  document.getElementById("vKmhOut").textContent = round(vEff * 3.6, 2) + " km/h";
+
+  // Diametro standard più vicino a Deq
+  let chosenDN = null;
+  let minDiff = Infinity;
+  for (let i = 0; i < stdDiameters.length; i++) {
+    const diff = Math.abs(stdDiameters[i] - Deq_mm);
+    if (diff < minDiff) {
+      minDiff = diff;
+      chosenDN = stdDiameters[i];
     }
-    if (chosen === null) {
-      chosen = stdDiameters[stdDiameters.length - 1];
-    }
+  }
 
-    stdDiamText = "DN " + chosen + " mm";
-
-    const D_chosen_m = chosen / 1000;
+  if (chosenDN) {
+    const D_chosen_m = chosenDN / 1000;
     const A_chosen = Math.PI * Math.pow(D_chosen_m, 2) / 4;
-    const V_chosen = (Q / 3600) / A_chosen;
-    stdVText = round(V_chosen, 2) + " m/s";
-  }
+    const V_chosen = Q_m3s / A_chosen;
 
-  document.getElementById("stdDiamOut").textContent = stdDiamText;
-  document.getElementById("stdDiamVOut").textContent = stdVText;
+    document.getElementById("stdDiamOut").textContent =
+      "DN " + chosenDN + " mm";
+    document.getElementById("stdDiamVOut").textContent =
+      round(V_chosen, 2) + " m/s";
+
+    // piccola tabella di velocità per qualche DN intorno al Deq
+    const stdTableOut = document.getElementById("stdTableOut");
+    const dnToShow = [];
+
+    // prendo massimo 7 diametri intorno a chosenDN
+    const chosenIndex = stdDiameters.indexOf(chosenDN);
+    const start = Math.max(0, chosenIndex - 3);
+    const end = Math.min(stdDiameters.length - 1, chosenIndex + 3);
+
+    for (let i = start; i <= end; i++) {
+      const dn = stdDiameters[i];
+      const Dm = dn / 1000;
+      const A_dn = Math.PI * Math.pow(Dm, 2) / 4;
+      const V_dn = Q_m3s / A_dn;
+      dnToShow.push("DN " + dn + " → " + round(V_dn, 2) + " m/s");
+    }
+    stdTableOut.textContent = dnToShow.join(" | ");
+  } else {
+    document.getElementById("stdDiamOut").textContent = "—";
+    document.getElementById("stdDiamVOut").textContent = "—";
+    document.getElementById("stdTableOut").textContent = "—";
+  }
 }
 </script>
 
