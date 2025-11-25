@@ -161,6 +161,27 @@ input:focus, select:focus {
   margin-bottom: 8px;
 }
 
+/* header piccolino per Q + unità */
+.flow-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.flow-header label {
+  margin-bottom: 0;
+}
+
+.flow-unit-select {
+  width: auto !important;
+  flex-shrink: 0;
+  font-size: 13px;
+  height: 32px;
+  line-height: 32px;
+  padding: 4px 8px;
+}
+
 /* link "Mostra limiti UNI" */
 .link-button {
   background: none;
@@ -173,12 +194,21 @@ input:focus, select:focus {
   text-align: left;
 }
 
+/* riquadro limiti UNI */
+#uniDetails {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  margin-top: 4px;
+  background: var(--bg-elevated);
+}
+
 /* tabella limiti UNI */
 .uni-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .uni-table th,
@@ -293,11 +323,14 @@ input:focus, select:focus {
 <div class="card">
   <h2>Input</h2>
 
-  <label>Portata Q (m³/h)</label>
-  <input id="flow_m3h" type="number" inputmode="decimal">
-
-  <label>Portata Q (l/s) (alternativa)</label>
-  <input id="flow_ls" type="number" inputmode="decimal">
+  <div class="flow-header">
+    <label for="flow">Portata Q</label>
+    <select id="flowUnit" class="flow-unit-select">
+      <option value="m3h">m³/h</option>
+      <option value="ls">l/s</option>
+    </select>
+  </div>
+  <input id="flow" type="number" inputmode="decimal">
 
   <label>Velocità V (m/s) (opzionale)</label>
   <input id="velocity" type="number" inputmode="decimal">
@@ -362,7 +395,7 @@ input:focus, select:focus {
   <h2>Risultati</h2>
 
   <div class="twoLine">
-    <span class="label">Area A</span>
+    <span class="label">Area</span>
     <span class="value" id="areaOut">—</span>
   </div>
 
@@ -456,7 +489,7 @@ const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
   document.documentElement.setAttribute("data-theme",(h>=7&&h<19)?"light":"dark");
 })();
 
-/* Toggle sezione e sincronizzazione Q */
+/* Toggle sezione */
 document.addEventListener("DOMContentLoaded",()=>{
   const geom=byId("geom");
   geom.addEventListener("change",()=>{
@@ -470,35 +503,6 @@ document.addEventListener("DOMContentLoaded",()=>{
       byId("dnBlock").style.display="none";
     }
     byId("circOut").style.display="none";
-  });
-
-  // sync Q m³/h <-> l/s
-  const fm = byId("flow_m3h");
-  const fl = byId("flow_ls");
-  let updatingFlow = false;
-
-  fm.addEventListener("input", ()=>{
-    if(updatingFlow) return;
-    updatingFlow = true;
-    const v = parseFloat(fm.value);
-    if(!isNaN(v) && v>0){
-      fl.value = round(v/3.6, 2); // m³/h -> l/s
-    } else {
-      fl.value = "";
-    }
-    updatingFlow = false;
-  });
-
-  fl.addEventListener("input", ()=>{
-    if(updatingFlow) return;
-    updatingFlow = true;
-    const v = parseFloat(fl.value);
-    if(!isNaN(v) && v>0){
-      fm.value = round(v*3.6, 0); // l/s -> m³/h
-    } else {
-      fm.value = "";
-    }
-    updatingFlow = false;
   });
 });
 
@@ -519,11 +523,12 @@ function getTag(v,min,max){
 
 /* RESET COMPLETO */
 function resetForm(){
-  ["flow_m3h","flow_ls","velocity","base","height","diam"].forEach(id=>{
+  ["flow","velocity","base","height","diam"].forEach(id=>{
     const el = byId(id);
     if(el) el.value = "";
   });
 
+  byId("flowUnit").value = "m3h";
   byId("scenario").value = "res";
   byId("geom").value = "rect";
 
@@ -557,17 +562,15 @@ function resetForm(){
 
 /* CALCOLO */
 function calcola(){
-  const Qm = parseFloat(byId("flow_m3h").value);
-  const Ql = parseFloat(byId("flow_ls").value);
+  const Qval = parseFloat(byId("flow").value);
+  const unit = byId("flowUnit").value;
   let Q = null;
 
-  if(!isNaN(Qm) && Qm>0){
-    Q = Qm;
-  } else if(!isNaN(Ql) && Ql>0){
-    Q = Ql * 3.6; // l/s -> m³/h
+  if(!isNaN(Qval) && Qval>0){
+    Q = (unit === "ls") ? Qval * 3.6 : Qval; // interno sempre m³/h
   }
 
-  if(!Q){alert("Inserisci una portata Q (m³/h o l/s) > 0");return;}
+  if(!Q){alert("Inserisci una portata Q > 0");return;}
 
   const V_in=parseFloat(byId("velocity").value);
   const geom=byId("geom").value;
