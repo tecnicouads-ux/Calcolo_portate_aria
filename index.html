@@ -190,13 +190,15 @@
 
   <!-- RISULTATI PRINCIPALI -->
   <div class="card">
-    <h2>Risultati principali</h2>
+    <h2>Risultati</h2>
     <div class="results">
       <div>Area A: <span id="areaOut">—</span></div>
       <div>Velocità considerata V: <span id="vEffOut">—</span>
         <span id="vEffTag" class="tag tag-na">n/d</span>
       </div>
       <div>Diametro equivalente Deq (da A): <span id="deqOut">—</span></div>
+      <div>DN standard più vicino: <span id="stdDNOut">—</span></div>
+      <div>Velocità con DN standard: <span id="stdDNVOut">—</span></div>
 
       <div id="rectOut" style="display:none;">
         <div>Base risultante: <span id="baseOut">—</span></div>
@@ -211,26 +213,6 @@
           <span id="vRealTag" class="tag tag-na">n/d</span>
         </div>
         <div>Sezione quadrata equivalente (lato): <span id="squareSideOut">—</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SUGGERIMENTO DIAMETRI STANDARD -->
-  <div class="card">
-    <h2>Diametri standard rispetto a Deq</h2>
-    <div class="note">
-      Diametro equivalente viene confrontato con diametri standard (DN).
-      Viene proposto il DN più vicino e la velocità con quella sezione.
-    </div>
-    <div class="results">
-      <div>Deq calcolato: <span id="deqStdBaseOut">—</span></div>
-      <div>DN standard più vicino: <span id="stdDiamOut">—</span></div>
-      <div>Velocità con quel DN: <span id="stdDiamVOut">—</span></div>
-      <div>Tabella vel. per DN (m/s):<br>
-        <span id="stdTableOut" style="font-size:0.8rem;">—</span>
-      </div>
-      <div>Diametri standard usati (mm):<br>
-        <span id="stdListOut" style="font-size:0.8rem;"></span>
       </div>
     </div>
   </div>
@@ -259,7 +241,7 @@ const scenarios = {
   none:     { name: "Nessun limite",             vMin: null, vMax: null }
 };
 
-// elenco diametri standard
+// diametri standard usati
 const stdDiameters = [100, 125, 150, 160, 200, 250, 315, 355, 400, 450, 500, 560, 600];
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -268,10 +250,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const circFields = document.getElementById("circ_fields");
   const scenSel = document.getElementById("scenario");
   const scenInfo = document.getElementById("scenarioInfo");
-  const stdListOut = document.getElementById("stdListOut");
-
-  // Mostra lista diametri standard
-  stdListOut.textContent = stdDiameters.join(", ");
 
   // scenario info
   function updateScenarioInfo() {
@@ -332,7 +310,6 @@ function calcola() {
     return;
   }
 
-  // variabili comuni
   let A = null;        // area m²
   let vEff = null;     // velocità effettiva usata per controlli
   let Deq_mm = null;   // diametro equivalente da A
@@ -347,7 +324,7 @@ function calcola() {
     let heightM = heightMm ? heightMm / 1000 : null;
 
     if (V_input && V_input > 0) {
-      // MODALITÀ DIMENSIONAMENTO: Q + V -> A
+      // DIMENSIONAMENTO: Q + V -> A
       A = Q_m3s / V_input;
       vEff = V_input;
 
@@ -359,10 +336,9 @@ function calcola() {
         baseM = A / heightM;
         baseMm = baseM * 1000;
       }
-      // se nessuna dimensione, ok: ho solo A e Deq
 
     } else {
-      // MODALITÀ VERIFICA: Q + sezione -> V
+      // VERIFICA: Q + sezione -> V
       if (!baseM || !heightM) {
         alert("Se la velocità non è nota, per sezione rettangolare devi inserire sia base che altezza.");
         return;
@@ -376,7 +352,6 @@ function calcola() {
       baseMm ? round(baseMm, 1) + " mm" : "—";
     document.getElementById("heightOut").textContent =
       heightMm ? round(heightMm, 1) + " mm" : "—";
-
   }
 
   // Circolare
@@ -387,7 +362,7 @@ function calcola() {
     circOut.style.display = "";
 
     if (V_input && V_input > 0) {
-      // MODALITÀ DIMENSIONAMENTO: Q + V -> A -> D_req
+      // DIMENSIONAMENTO: Q + V -> A -> D_req
       A = Q_m3s / V_input;
       vEff = V_input;
 
@@ -396,7 +371,6 @@ function calcola() {
       document.getElementById("dReqOut").textContent = round(D_req_mm, 1) + " mm";
 
       if (dInputMm && dInputMm > 0) {
-        // confronto con diametro inserito
         document.getElementById("dInsOut").textContent =
           round(dInputMm, 1) + " mm";
 
@@ -420,7 +394,7 @@ function calcola() {
       }
 
     } else {
-      // MODALITÀ VERIFICA: Q + D -> A, V
+      // VERIFICA: Q + D -> A, V
       if (!D_ins_m) {
         alert("Se la velocità non è nota, per sezione circolare devi inserire il diametro.");
         return;
@@ -446,31 +420,27 @@ function calcola() {
     }
   }
 
-  // Se ancora non ho A o vEff, non posso andare avanti
   if (!A || !vEff || A <= 0 || vEff <= 0) {
     alert("Impossibile determinare correttamente area e velocità. Controlla i dati.");
     return;
   }
 
-  // Area e Deq (comuni)
+  // Area, Deq, conversioni
   document.getElementById("areaOut").textContent = round(A, 4) + " m²";
   const Deq_m = Math.sqrt(4 * A / Math.PI);
-  Deq_mm = Deq_m * 1000;
+  const Deq_mm = Deq_m * 1000;
   document.getElementById("deqOut").textContent = round(Deq_mm, 1) + " mm";
-  document.getElementById("deqStdBaseOut").textContent = round(Deq_mm, 1) + " mm";
 
-  // Velocità effettiva + tag rispetto scenario
   document.getElementById("vEffOut").textContent = round(vEff, 2) + " m/s";
   const vEffTag = getVelocityTag(vEff, scen.vMin, scen.vMax);
   vEffTagEl.textContent = vEffTag.text;
   vEffTagEl.className = "tag " + vEffTag.cls;
 
-  // Conversioni
   document.getElementById("qM3sOut").textContent = round(Q_m3s, 4);
-  document.getElementById("areaCm2Out").textContent = round(A * 10000, 1); // 1 m² = 10.000 cm²
+  document.getElementById("areaCm2Out").textContent = round(A * 10000, 1);
   document.getElementById("vKmhOut").textContent = round(vEff * 3.6, 2) + " km/h";
 
-  // Diametro standard più vicino a Deq
+  // DN standard più vicino
   let chosenDN = null;
   let minDiff = Infinity;
   for (let i = 0; i < stdDiameters.length; i++) {
@@ -486,36 +456,16 @@ function calcola() {
     const A_chosen = Math.PI * Math.pow(D_chosen_m, 2) / 4;
     const V_chosen = Q_m3s / A_chosen;
 
-    document.getElementById("stdDiamOut").textContent =
+    document.getElementById("stdDNOut").textContent =
       "DN " + chosenDN + " mm";
-    document.getElementById("stdDiamVOut").textContent =
+    document.getElementById("stdDNVOut").textContent =
       round(V_chosen, 2) + " m/s";
-
-    // piccola tabella di velocità per qualche DN intorno al Deq
-    const stdTableOut = document.getElementById("stdTableOut");
-    const dnToShow = [];
-
-    // prendo massimo 7 diametri intorno a chosenDN
-    const chosenIndex = stdDiameters.indexOf(chosenDN);
-    const start = Math.max(0, chosenIndex - 3);
-    const end = Math.min(stdDiameters.length - 1, chosenIndex + 3);
-
-    for (let i = start; i <= end; i++) {
-      const dn = stdDiameters[i];
-      const Dm = dn / 1000;
-      const A_dn = Math.PI * Math.pow(Dm, 2) / 4;
-      const V_dn = Q_m3s / A_dn;
-      dnToShow.push("DN " + dn + " → " + round(V_dn, 2) + " m/s");
-    }
-    stdTableOut.textContent = dnToShow.join(" | ");
   } else {
-    document.getElementById("stdDiamOut").textContent = "—";
-    document.getElementById("stdDiamVOut").textContent = "—";
-    document.getElementById("stdTableOut").textContent = "—";
+    document.getElementById("stdDNOut").textContent = "—";
+    document.getElementById("stdDNVOut").textContent = "—";
   }
 }
 </script>
 
 </body>
 </html>
-
