@@ -193,9 +193,11 @@
         <div>Velocità con DN standard: <span id="stdDNVOut">—</span></div>
       </div>
 
-      <!-- BLOCCO CIRCOLARE (solo lato quadrato equivalente) -->
+      <!-- BLOCCO CIRCOLARE -->
       <div id="circOut" style="display:none;">
         <div>Sezione quadrata equivalente (lato): <span id="squareSideOut">—</span></div>
+        <div>DN standard consigliato: <span id="circDNOut">—</span></div>
+        <div>Velocità con DN consigliato: <span id="circDNVOut">—</span></div>
       </div>
     </div>
   </div>
@@ -274,10 +276,14 @@ function calcola(){
   const dnBlock=byId("dnBlock");
   const circOut=byId("circOut");
   const vEffTagEl=byId("vEffTag");
+  const circDNOut=byId("circDNOut");
+  const circDNVOut=byId("circDNVOut");
 
   circOut.style.display="none";
   vEffTagEl.textContent="n/d";
   vEffTagEl.className="tag tag-na";
+  circDNOut.textContent="—";
+  circDNVOut.textContent="—";
 
   if(!Q || Q<=0){
     alert("Inserisci portata Q > 0");
@@ -300,7 +306,7 @@ function calcola(){
       // Dimensionamento: Q + V -> A
       A=Qs/V_input;
       vEff=V_input;
-      // base/altezza possono anche essere vuote, non sono obbligatorie
+      // base/altezza opzionali: Deq e DN usano solo A
     }else{
       // Verifica: Q + sezione -> V
       if(!b || !h){
@@ -333,11 +339,30 @@ function calcola(){
       vEff=Qs/A;
     }
 
-    // Mostro solo lato quadrato equivalente
+    // Mostro sempre lato quadrato equivalente
     circOut.style.display="";
     const side_m=Math.sqrt(A);
     const side_mm=side_m*1000;
     byId("squareSideOut").textContent=round(side_mm,1)+" mm";
+
+    // Se ho SOLO Q + V (diametro NON inserito) -> calcolo DN consigliato da A
+    if(V_input && V_input>0 && !hasD){
+      const Deq_mm=Math.sqrt(4*A/Math.PI)*1000;
+      let best=null,minDiff=1e9;
+      for(const dn of stdDiameters){
+        const diff=Math.abs(dn-Deq_mm);
+        if(diff<minDiff){
+          minDiff=diff;
+          best=dn;
+        }
+      }
+      if(best){
+        circDNOut.textContent="DN "+best+" mm";
+        const Astd=Math.PI*(best/1000)**2/4;
+        const Vstd=Qs/Astd;
+        circDNVOut.textContent=round(Vstd,2)+" m/s";
+      }
+    }
   }
 
   if(!A || !vEff || A<=0 || vEff<=0){
