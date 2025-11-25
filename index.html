@@ -63,42 +63,61 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER COMPATTO + LOGO 80PX (STILE A)
+   HEADER WRAPPER + BANNER TESTO + LOGO "CHE ESCE"
 ------------------------------------------------------------- */
-header {
+.header-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.header-wrapper {
+  position: relative;
+  margin-bottom: 42px; /* spazio per il logo che esce sotto */
+}
+
+.header-card {
   background: var(--bg-elevated);
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 12px;
   box-shadow: 0 6px 14px var(--shadow-header);
   border: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  min-height: 60px;
+  min-height: 40px; /* banner basso */
 }
 
-.app-logo {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  border-radius: 10px;
-  flex-shrink: 0;
-  margin: 0;
+.header-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .app-title {
   font-size: 17px;
   font-weight: 700;
-  line-height: 1.0;
-  margin-bottom: 3px;
+  line-height: 1.1;
+  margin: 0 0 3px 0;
 }
 
 .app-subtitle {
   font-size: 11px;
   color: var(--text-muted);
-  margin-top: 0;
-  line-height: 1.0;
+  line-height: 1.1;
+  margin: 0;
+}
+
+/* Logo flottante che "esce" dal banner */
+.app-logo-floating {
+  position: absolute;
+  left: 10px;
+  bottom: -26px;        /* quanto esce sotto il banner */
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 10px 18px rgba(0,0,0,0.65);
+  background: var(--bg-elevated);
 }
 
 /* -------------------------------------------------------------
@@ -229,15 +248,17 @@ input:focus, select:focus {
 <body>
 <div class="app">
 
-<!-- HEADER CON LINK AL SITO ADS -->
-<a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
-<header>
-  <img src="logo.png" alt="Logo" class="app-logo">
-  <div style="display:flex; flex-direction:column; justify-content:center;">
-    <div class="app-title">Calcolo Portate Aria</div>
-    <div class="app-subtitle">Air Distribution Systems</div>
+<!-- HEADER BANNER + LOGO FLOTTANTE -->
+<a href="https://www.airdistributionsystems.it/home.php" target="_blank" class="header-link">
+  <div class="header-wrapper">
+    <div class="header-card">
+      <div class="header-text">
+        <div class="app-title">Calcolo Portate Aria</div>
+        <div class="app-subtitle">Air Distribution Systems</div>
+      </div>
+    </div>
+    <img src="logo.png" alt="Logo" class="app-logo-floating">
   </div>
-</header>
 </a>
 
 <!-- ===================== INPUT ===================== -->
@@ -578,519 +599,3 @@ function calcola(){
 
 </body>
 </html>
-   HEADER COMPATTO + LOGO 80PX (STILE A)
-------------------------------------------------------------- */
-header {
-  background: var(--bg-elevated);
-  padding: 4px 8px;
-  border-radius: 12px;
-  box-shadow: 0 6px 14px var(--shadow-header);
-  border: 1px solid var(--border-soft);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-  min-height: 60px;
-}
-
-.app-logo {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  border-radius: 10px;
-  flex-shrink: 0;
-  margin: 0;
-}
-
-.app-title {
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.0;
-  margin-bottom: 3px;
-}
-
-.app-subtitle {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 0;
-  line-height: 1.0;
-}
-
-/* -------------------------------------------------------------
-   CARD
-------------------------------------------------------------- */
-.card {
-  background: var(--card-soft);
-  padding: 14px;
-  border-radius: 16px;
-  margin-bottom: 16px;
-  border: 1px solid var(--border-soft);
-  box-shadow: 0 10px 24px var(--shadow-strong);
-}
-
-.card h2 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-/* -------------------------------------------------------------
-   INPUT & SELECT (STESSA LARGHEZZA)
-------------------------------------------------------------- */
-label {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 2px;
-  display: block;
-}
-
-input, select {
-  width: 100% !important;
-  box-sizing: border-box;
-  font-size: 15px;
-  padding: 7px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  color: var(--text-main);
-  margin-bottom: 6px;
-}
-
-input:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-  outline: none;
-}
-
-.auto-note {
-  font-size: 11px;
-  color: var(--accent);
-  margin-top: -2px;
-  margin-bottom: 8px;
-}
-
-/* -------------------------------------------------------------
-   BOTTONI
-------------------------------------------------------------- */
-.btn-primary {
-  width: 100%;
-  padding: 11px;
-  border-radius: 999px;
-  font-size: 15px;
-  font-weight: 700;
-  background: var(--accent);
-  color: #022c22;
-  border: none;
-  box-shadow: 0 8px 20px rgba(34,197,94,0.45);
-}
-
-/* -------------------------------------------------------------
-   RISULTATI A 2 RIGHE
-------------------------------------------------------------- */
-.twoLine {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.twoLine .label {
-  font-size: 13px;
-  color: var(--text-muted);
-  white-space: normal;
-}
-
-.twoLine .value {
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* TAG VELOCITÀ */
-.tag {
-  white-space: nowrap;
-  padding: 2px 8px;
-  font-size: 12px;
-  border-radius: 999px;
-  font-weight: 700;
-  margin-left: 6px;
-}
-
-.tag-ok  { background:#22c55e33; color:#22c55e; }
-.tag-low { background:#3b82f630; color:#3b82f6; }
-.tag-high{ background:#f9731630; color:#fb923c; }
-.tag-na  { background:#6b728033; color:#6b7280; }
-
-/* -------------------------------------------------------------
-   SUGGERIMENTO
-------------------------------------------------------------- */
-#suggestCard {
-  background:#f9731615;
-  border:1px solid #f97316;
-}
-
-#suggText {
-  white-space: normal !important;
-  overflow-wrap: break-word;
-  font-size: 14px;
-  line-height: 1.35;
-}
-</style>
-</head>
-
-<body>
-<div class="app">
-
-<!-- HEADER CON LINK AL SITO ADS -->
-<a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
-<header>
-  <img src="logo.png" alt="Logo" class="app-logo">
-  <div style="display:flex; flex-direction:column; justify-content:center;">
-    <div class="app-title">Calcolo Portate Aria</div>
-    <div class="app-subtitle">Air Distribution Systems</div>
-  </div>
-</header>
-</a>
-
-<!-- ===================== INPUT ===================== -->
-<div class="card">
-  <h2>Input</h2>
-
-  <label>Portata Q (m³/h)</label>
-  <input id="flow" type="number" inputmode="decimal">
-
-  <label>Velocità V (m/s) (opzionale)</label>
-  <input id="velocity" type="number" inputmode="decimal">
-
-  <label>Scenario UNI</label>
-  <select id="scenario">
-    <option value="res">Abitazione</option>
-    <option value="office">Uffici</option>
-    <option value="hospital">Ospedale</option>
-    <option value="extract">Estrazione</option>
-    <option value="main">Montante</option>
-    <option value="none">Nessun limite</option>
-  </select>
-
-  <label>Tipo sezione</label>
-  <select id="geom">
-    <option value="rect">Rettangolare</option>
-    <option value="circ">Circolare</option>
-  </select>
-
-  <div id="rect_fields">
-    <label>Base (mm)</label>
-    <input id="base" type="number" inputmode="decimal">
-    <div id="baseNote" class="auto-note" style="display:none;">Calcolato automaticamente</div>
-
-    <label>Altezza (mm)</label>
-    <input id="height" type="number" inputmode="decimal">
-    <div id="heightNote" class="auto-note" style="display:none;">Calcolato automaticamente</div>
-  </div>
-
-  <div id="circ_fields" style="display:none;">
-    <label>Diametro (mm)</label>
-    <input id="diam" type="number" inputmode="decimal">
-  </div>
-
-  <button class="btn-primary" onclick="calcola()">Calcola</button>
-</div>
-
-<!-- ===================== RISULTATI ===================== -->
-<div class="card">
-  <h2>Risultati</h2>
-
-  <div class="twoLine">
-    <span class="label">Area A</span>
-    <span class="value" id="areaOut">—</span>
-  </div>
-
-  <div class="twoLine">
-    <span class="label">Velocità</span>
-    <span class="value">
-      <span id="vEffOut">—</span>
-      <span id="vEffTag" class="tag tag-na">n/d</span>
-    </span>
-  </div>
-
-  <div id="dnBlock">
-
-    <div class="twoLine">
-      <span class="label">Diametro equivalente</span>
-      <span class="value" id="deqOut">—</span>
-    </div>
-
-    <div class="twoLine">
-      <span class="label">DN standard</span>
-      <span class="value" id="stdDNOut">—</span>
-    </div>
-
-    <div class="twoLine">
-      <span class="label">Velocità con DN</span>
-      <span class="value" id="stdDNVOut">—</span>
-    </div>
-
-    <div id="rectSquareRow" class="twoLine" style="display:none;">
-      <span class="label">Lato sezione quadrata</span>
-      <span class="value" id="rectSquareOut">—</span>
-    </div>
-
-  </div>
-
-  <div id="circOut" style="display:none;">
-
-    <div class="twoLine">
-      <span class="label">Lato sezione quadrata</span>
-      <span class="value" id="squareSideOut">—</span>
-    </div>
-
-    <div class="twoLine">
-      <span class="label">DN consigliato</span>
-      <span class="value" id="circDNOut">—</span>
-    </div>
-
-    <div class="twoLine">
-      <span class="label">Velocità DN consigliato</span>
-      <span class="value" id="circDNVOut">—</span>
-    </div>
-
-  </div>
-
-</div>
-
-<!-- ===================== SUGGERIMENTO ===================== -->
-<div class="card" id="suggestCard" style="display:none;">
-  <h2>Suggerimento</h2>
-  <div class="twoLine">
-    <span class="label">Consiglio UNI</span>
-    <span class="value" id="suggText">—</span>
-  </div>
-</div>
-
-<!-- ===================== SCRIPT ===================== -->
-<script>
-function byId(i){return document.getElementById(i);}
-function round(v,d){return Math.round(v*10**d)/10**d;}
-
-const scenarios={
-  res:{vMin:1.5,vMax:3.5},
-  office:{vMin:2.0,vMax:4.0},
-  hospital:{vMin:1.5,vMax:3.0},
-  extract:{vMin:5.0,vMax:8.0},
-  main:{vMin:6.0,vMax:9.0},
-  none:{vMin:null,vMax:null}
-};
-
-const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
-
-/* Tema giorno/notte */
-(function(){
-  const h=new Date().getHours();
-  document.documentElement.setAttribute("data-theme",(h>=7&&h<19)?"light":"dark");
-})();
-
-/* Toggle sezione */
-document.addEventListener("DOMContentLoaded",()=>{
-  const geom=byId("geom");
-  geom.addEventListener("change",()=>{
-    if(geom.value==="rect"){
-      byId("rect_fields").style.display="";
-      byId("circ_fields").style.display="none";
-      byId("dnBlock").style.display="";
-    } else {
-      byId("rect_fields").style.display="none";
-      byId("circ_fields").style.display="";
-      byId("dnBlock").style.display="none";
-    }
-    byId("circOut").style.display="none";
-  });
-});
-
-/* Tag velocità */
-function getTag(v,min,max){
-  if(min==null) return {text:"n/d",cls:"tag-na"};
-  if(v<min) return {text:"Bassa",cls:"tag-low"};
-  if(v<=max) return {text:"OK",cls:"tag-ok"};
-  return {text:"Alta",cls:"tag-high"};
-}
-
-/* CALCOLO */
-function calcola(){
-  const Q=parseFloat(byId("flow").value);
-  const V_in=parseFloat(byId("velocity").value);
-  const geom=byId("geom").value;
-  const scen=scenarios[byId("scenario").value];
-
-  if(!Q||Q<=0){alert("Inserisci Q > 0");return;}
-  const Qs=Q/3600;
-
-  let A=null,v=null;
-
-  /* RESET */
-  byId("circOut").style.display="none";
-  byId("rectSquareRow").style.display="none";
-  byId("rectSquareOut").textContent="—";
-  byId("suggText").textContent="—";
-  byId("suggestCard").style.display="none";
-  byId("baseNote").style.display="none";
-  byId("heightNote").style.display="none";
-
-  /* RETTANGOLARE */
-  if(geom==="rect"){
-    const bMm=parseFloat(byId("base").value);
-    const hMm=parseFloat(byId("height").value);
-    let b=bMm?bMm/1000:null;
-    let h=hMm?hMm/1000:null;
-
-    const hasB=!!b;
-    const hasH=!!h;
-
-    if(V_in){
-      A=Qs/V_in;
-      v=V_in;
-
-      if(hasB && !hasH){
-        h=A/b;
-        byId("height").value=round(h*1000,1);
-        byId("heightNote").style.display="";
-      }
-      else if(!hasB && hasH){
-        b=A/h;
-        byId("base").value=round(b*1000,1);
-        byId("baseNote").style.display="";
-      }
-      else if(!hasB && !hasH){
-        const side=Math.sqrt(A)*1000;
-        byId("rectSquareRow").style.display="";
-        byId("rectSquareOut").textContent=round(side,1)+" mm";
-      }
-      else {
-        A=b*h;
-        v=Qs/A;
-      }
-
-    } else {
-      if(!hasB || !hasH){
-        alert("Se la velocità non è nota, inserisci sia base che altezza.");
-        return;
-      }
-      A=b*h;
-      v=Qs/A;
-    }
-  }
-
-  /* CIRCOLARE */
-  if(geom==="circ"){
-    const dMm=parseFloat(byId("diam").value);
-    const hasD=dMm>0;
-
-    if(V_in){
-      A=Qs/V_in;
-      v=V_in;
-    } else {
-      if(!hasD){alert("Se V è sconosciuta, inserisci diametro.");return;}
-      const d=dMm/1000;
-      A=Math.PI*d*d/4;
-      v=Qs/A;
-    }
-
-    byId("circOut").style.display="";
-    const side=Math.sqrt(A)*1000;
-    byId("squareSideOut").textContent=round(side,1)+" mm";
-
-    if(V_in && !hasD){
-      const Deq=Math.sqrt(4*A/Math.PI)*1000;
-      let best=null,min=1e9;
-      for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq)<min){
-          min=Math.abs(dn-Deq);
-          best=dn;
-        }
-      }
-      byId("circDNOut").textContent="DN "+best+" mm";
-      const Astd=Math.PI*(best/1000)**2/4;
-      byId("circDNVOut").textContent=round(Qs/Astd,2)+" m/s";
-    }
-  }
-
-  if(!A||!v){alert("Errore.");return;}
-
-  /* RISULTATI */
-
-  byId("areaOut").textContent =
-    round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
-
-  byId("vEffOut").textContent = round(v,2)+" m/s";
-
-  const tag = getTag(v,scen.vMin,scen.vMax);
-  byId("vEffTag").textContent = tag.text;
-  byId("vEffTag").className = "tag "+tag.cls;
-
-  /* DN RETTANGOLARE */
-  if(geom==="rect"){
-    const Deq = Math.sqrt(4*A/Math.PI)*1000;
-    byId("deqOut").textContent = round(Deq,1)+" mm";
-
-    let best=null,min=1e9;
-    for(const dn of stdDiameters){
-      if(Math.abs(dn-Deq)<min){
-        min=Math.abs(dn-Deq);
-        best=dn;
-      }
-    }
-
-    if(best){
-      byId("stdDNOut").textContent="DN "+best+" mm";
-      const Astd=Math.PI*(best/1000)**2/4;
-      byId("stdDNVOut").textContent=round(Qs/Astd,2)+" m/s";
-    } else {
-      byId("stdDNOut").textContent="—";
-      byId("stdDNVOut").textContent="—";
-    }
-  }
-  else {
-    byId("deqOut").textContent="—";
-    byId("stdDNOut").textContent="—";
-    byId("stdDNVOut").textContent="—";
-  }
-
-  /* SUGGERIMENTO UNI */
-  if(scen.vMax!=null && v>scen.vMax){
-    const vT = (scen.vMin+scen.vMax)/2;
-    const Anew = Qs / vT;
-
-    if(geom==="rect"){
-      const side=Math.sqrt(Anew)*1000;
-      byId("suggText").textContent =
-        "Velocità troppo alta. Sezione consigliata ~ " +
-        round(side,1)+" × "+round(side,1)+" mm.";
-    }
-
-    else {
-      const Deq = Math.sqrt(4*Anew/Math.PI)*1000;
-      let best=null,min=1e9;
-      for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq)<min){
-          min=Math.abs(dn-Deq);
-          best=dn;
-        }
-      }
-      const Astd=Math.PI*(best/1000)**2/4;
-      const v2 = Qs/Astd;
-
-      byId("suggText").textContent =
-        "Velocità troppo alta. Suggerito DN "+best+" mm (V≈"+
-        round(v2,2)+" m/s).";
-    }
-
-    byId("suggestCard").style.display="";
-  }
-}
-</script>
-
-</body>
-</html>
-
