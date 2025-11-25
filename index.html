@@ -63,7 +63,7 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER COMPATTO + LOGO 80PX (STILE A)
+   HEADER COMPATTO + LOGO 80PX
 ------------------------------------------------------------- */
 header {
   background: var(--bg-elevated);
@@ -120,7 +120,7 @@ header {
 }
 
 /* -------------------------------------------------------------
-   INPUT & SELECT (STESSA LARGHEZZA + ALTEZZA)
+   INPUT & SELECT
 ------------------------------------------------------------- */
 label {
   font-size: 14px;
@@ -161,6 +161,36 @@ input:focus, select:focus {
   margin-bottom: 8px;
 }
 
+/* link "Mostra limiti UNI" */
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 4px 0 6px 0;
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-align: left;
+}
+
+/* tabella limiti UNI */
+.uni-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.uni-table th,
+.uni-table td {
+  border: 1px solid var(--border-soft);
+  padding: 3px 4px;
+}
+
+.uni-table th {
+  background: rgba(148,163,184,0.14);
+}
+
 /* -------------------------------------------------------------
    BOTTONI
 ------------------------------------------------------------- */
@@ -174,6 +204,18 @@ input:focus, select:focus {
   color: #022c22;
   border: none;
   box-shadow: 0 8px 20px rgba(34,197,94,0.45);
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 9px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-soft);
+  margin-top: 6px;
 }
 
 /* -------------------------------------------------------------
@@ -252,7 +294,10 @@ input:focus, select:focus {
   <h2>Input</h2>
 
   <label>Portata Q (m³/h)</label>
-  <input id="flow" type="number" inputmode="decimal">
+  <input id="flow_m3h" type="number" inputmode="decimal">
+
+  <label>Portata Q (l/s) (alternativa)</label>
+  <input id="flow_ls" type="number" inputmode="decimal">
 
   <label>Velocità V (m/s) (opzionale)</label>
   <input id="velocity" type="number" inputmode="decimal">
@@ -266,6 +311,26 @@ input:focus, select:focus {
     <option value="main">Montante principale</option>
     <option value="none">Nessuna limitazione</option>
   </select>
+
+  <button type="button" class="link-button" onclick="toggleUni()">Mostra / Nascondi limiti UNI</button>
+  <div id="uniDetails" style="display:none;">
+    <table class="uni-table">
+      <thead>
+        <tr>
+          <th>Tipo ambiente</th>
+          <th>v min [m/s]</th>
+          <th>v max [m/s]</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Residenziale</td><td>1.5</td><td>3.0</td></tr>
+        <tr><td>Uffici / Terziario</td><td>2.5</td><td>4.5</td></tr>
+        <tr><td>Area sanitaria</td><td>1.5</td><td>2.5</td></tr>
+        <tr><td>Estrazione cucine / servizi</td><td>5.0</td><td>7.0</td></tr>
+        <tr><td>Montanti principali</td><td>4.0</td><td>6.5</td></tr>
+      </tbody>
+    </table>
+  </div>
 
   <label>Forma canale</label>
   <select id="geom">
@@ -289,6 +354,7 @@ input:focus, select:focus {
   </div>
 
   <button class="btn-primary" onclick="calcola()">Calcola</button>
+  <button class="btn-secondary" type="button" onclick="resetForm()">Nuovo calcolo / Reset</button>
 </div>
 
 <!-- ===================== RISULTATI ===================== -->
@@ -390,7 +456,7 @@ const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
   document.documentElement.setAttribute("data-theme",(h>=7&&h<19)?"light":"dark");
 })();
 
-/* Toggle sezione */
+/* Toggle sezione e sincronizzazione Q */
 document.addEventListener("DOMContentLoaded",()=>{
   const geom=byId("geom");
   geom.addEventListener("change",()=>{
@@ -405,7 +471,43 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     byId("circOut").style.display="none";
   });
+
+  // sync Q m³/h <-> l/s
+  const fm = byId("flow_m3h");
+  const fl = byId("flow_ls");
+  let updatingFlow = false;
+
+  fm.addEventListener("input", ()=>{
+    if(updatingFlow) return;
+    updatingFlow = true;
+    const v = parseFloat(fm.value);
+    if(!isNaN(v) && v>0){
+      fl.value = round(v/3.6, 2); // m³/h -> l/s
+    } else {
+      fl.value = "";
+    }
+    updatingFlow = false;
+  });
+
+  fl.addEventListener("input", ()=>{
+    if(updatingFlow) return;
+    updatingFlow = true;
+    const v = parseFloat(fl.value);
+    if(!isNaN(v) && v>0){
+      fm.value = round(v*3.6, 0); // l/s -> m³/h
+    } else {
+      fm.value = "";
+    }
+    updatingFlow = false;
+  });
 });
+
+/* Mostra / nascondi tabella limiti UNI */
+function toggleUni(){
+  const box = byId("uniDetails");
+  if(!box) return;
+  box.style.display = (box.style.display==="none" || box.style.display==="") ? "block" : "none";
+}
 
 /* Tag velocità */
 function getTag(v,min,max){
@@ -415,19 +517,67 @@ function getTag(v,min,max){
   return {text:"Alta",cls:"tag-high"};
 }
 
+/* RESET COMPLETO */
+function resetForm(){
+  ["flow_m3h","flow_ls","velocity","base","height","diam"].forEach(id=>{
+    const el = byId(id);
+    if(el) el.value = "";
+  });
+
+  byId("scenario").value = "res";
+  byId("geom").value = "rect";
+
+  byId("rect_fields").style.display = "";
+  byId("circ_fields").style.display = "none";
+  byId("dnBlock").style.display = "";
+
+  byId("areaOut").textContent = "—";
+  byId("vEffOut").textContent = "—";
+  byId("vEffTag").textContent = "n/d";
+  byId("vEffTag").className = "tag tag-na";
+  byId("stdDNOut").textContent = "—";
+  byId("stdDNVOut").textContent = "—";
+  byId("rectSquareOut").textContent = "—";
+  byId("squareSideOut").textContent = "—";
+  byId("circDNOut").textContent = "—";
+  byId("circDNVOut").textContent = "—";
+  byId("suggText").textContent = "—";
+
+  byId("rectSquareRow").style.display = "none";
+  byId("circOut").style.display = "none";
+  byId("suggestCard").style.display = "none";
+  byId("baseNote").style.display = "none";
+  byId("heightNote").style.display = "none";
+
+  const uniBox = byId("uniDetails");
+  if(uniBox) uniBox.style.display = "none";
+
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
 /* CALCOLO */
 function calcola(){
-  const Q=parseFloat(byId("flow").value);
+  const Qm = parseFloat(byId("flow_m3h").value);
+  const Ql = parseFloat(byId("flow_ls").value);
+  let Q = null;
+
+  if(!isNaN(Qm) && Qm>0){
+    Q = Qm;
+  } else if(!isNaN(Ql) && Ql>0){
+    Q = Ql * 3.6; // l/s -> m³/h
+  }
+
+  if(!Q){alert("Inserisci una portata Q (m³/h o l/s) > 0");return;}
+
   const V_in=parseFloat(byId("velocity").value);
   const geom=byId("geom").value;
   const scen=scenarios[byId("scenario").value];
 
-  if(!Q||Q<=0){alert("Inserisci Q > 0");return;}
   const Qs=Q/3600;
 
   let A=null,v=null;
 
-  /* RESET */
+  /* RESET parziale output calcolo */
   byId("circOut").style.display="none";
   byId("rectSquareRow").style.display="none";
   byId("rectSquareOut").textContent="—";
@@ -584,7 +734,7 @@ function calcola(){
     byId("suggestCard").style.display="";
   }
 
-  /* 👉 SCROLL AI RISULTATI SU iPHONE (E WEB) */
+  /* 👉 SCROLL AI RISULTATI */
   const resCard = byId("resultsCard");
   if(resCard && resCard.scrollIntoView){
     resCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
