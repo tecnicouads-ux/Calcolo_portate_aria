@@ -128,12 +128,12 @@
 <body>
   <h1>Calcolo Canale Aria</h1>
 
-  <!-- INPUT UNICO -->
+  <!-- INPUT -->
   <div class="card">
-    <h2>Input principali</h2>
+    <h2>Input</h2>
     <div class="note">
-      • Se conosci Q e V, dimensioni la sezione.<br>
-      • Se NON conosci V, inserisci Q + dimensioni canale, e calcolo io V reale.
+      • Se conosci Q e V → dimensionamento.<br>
+      • Se non conosci V → inserisci Q + dimensioni e ti calcolo V reale.
     </div>
 
     <label>Portata Q (m³/h)</label>
@@ -171,8 +171,8 @@
         </div>
       </div>
       <div class="note">
-        • Se V è nota: puoi inserire solo base o solo altezza, e calcolo l'altra.<br>
-        • Se V è vuota: DEVI inserire sia base che altezza (canale esistente).
+        • Con V nota: puoi mettere solo base o solo altezza e ti calcolo l'altra.<br>
+        • Senza V: devi inserire sia base che altezza (canale esistente).
       </div>
     </div>
 
@@ -180,15 +180,15 @@
       <label>Diametro (mm)</label>
       <input id="diam" type="number" placeholder="es. 250">
       <div class="note">
-        • Se V è nota: se lasci vuoto, calcolo il diametro richiesto; se lo metti, confronto.<br>
-        • Se V è vuota: devi inserire il diametro del canale esistente, calcolo V reale.
+        • Con V nota: se vuoto → calcolo D richiesto; se inserito → confronto.<br>
+        • Senza V: devi inserire il D del canale esistente, ti calcolo V reale.
       </div>
     </div>
 
     <button class="btn-primary" onclick="calcola()">Calcola</button>
   </div>
 
-  <!-- RISULTATI PRINCIPALI -->
+  <!-- RISULTATI -->
   <div class="card">
     <h2>Risultati</h2>
     <div class="results">
@@ -251,7 +251,6 @@ document.addEventListener("DOMContentLoaded", function() {
   const scenSel = document.getElementById("scenario");
   const scenInfo = document.getElementById("scenarioInfo");
 
-  // scenario info
   function updateScenarioInfo() {
     const s = scenarios[scenSel.value];
     if (s.vMin != null && s.vMax != null) {
@@ -263,7 +262,6 @@ document.addEventListener("DOMContentLoaded", function() {
   scenSel.addEventListener("change", updateScenarioInfo);
   updateScenarioInfo();
 
-  // passaggio rettangolare / circolare
   geomSel.addEventListener("change", function() {
     if (geomSel.value === "rect") {
       rectFields.style.display = "";
@@ -310,10 +308,8 @@ function calcola() {
     return;
   }
 
-  let A = null;        // area m²
-  let vEff = null;     // velocità effettiva usata per controlli
-  let Deq_mm = null;   // diametro equivalente da A
-
+  let A = null;      // area m²
+  let vEff = null;   // velocità effettiva
   const Q_m3s = Q / 3600;
 
   // Rettangolare
@@ -324,11 +320,10 @@ function calcola() {
     let heightM = heightMm ? heightMm / 1000 : null;
 
     if (V_input && V_input > 0) {
-      // DIMENSIONAMENTO: Q + V -> A
+      // Dimensionamento: Q + V -> A
       A = Q_m3s / V_input;
       vEff = V_input;
 
-      // se ho solo una dimensione, ricavo l'altra
       if (baseM && !heightM) {
         heightM = A / baseM;
         heightMm = heightM * 1000;
@@ -338,7 +333,7 @@ function calcola() {
       }
 
     } else {
-      // VERIFICA: Q + sezione -> V
+      // Verifica: Q + sezione -> V
       if (!baseM || !heightM) {
         alert("Se la velocità non è nota, per sezione rettangolare devi inserire sia base che altezza.");
         return;
@@ -362,7 +357,7 @@ function calcola() {
     circOut.style.display = "";
 
     if (V_input && V_input > 0) {
-      // DIMENSIONAMENTO: Q + V -> A -> D_req
+      // Dimensionamento: Q + V -> A -> D_req
       A = Q_m3s / V_input;
       vEff = V_input;
 
@@ -394,7 +389,7 @@ function calcola() {
       }
 
     } else {
-      // VERIFICA: Q + D -> A, V
+      // Verifica: Q + D -> A, V
       if (!D_ins_m) {
         alert("Se la velocità non è nota, per sezione circolare devi inserire il diametro.");
         return;
@@ -427,20 +422,21 @@ function calcola() {
 
   // Area, Deq, conversioni
   document.getElementById("areaOut").textContent = round(A, 4) + " m²";
+
   const Deq_m = Math.sqrt(4 * A / Math.PI);
   const Deq_mm = Deq_m * 1000;
   document.getElementById("deqOut").textContent = round(Deq_mm, 1) + " mm";
+
+  document.getElementById("qM3sOut").textContent = round(Q_m3s, 4);
+  document.getElementById("areaCm2Out").textContent = round(A * 10000, 1);
+  document.getElementById("vKmhOut").textContent = round(vEff * 3.6, 2) + " km/h";
 
   document.getElementById("vEffOut").textContent = round(vEff, 2) + " m/s";
   const vEffTag = getVelocityTag(vEff, scen.vMin, scen.vMax);
   vEffTagEl.textContent = vEffTag.text;
   vEffTagEl.className = "tag " + vEffTag.cls;
 
-  document.getElementById("qM3sOut").textContent = round(Q_m3s, 4);
-  document.getElementById("areaCm2Out").textContent = round(A * 10000, 1);
-  document.getElementById("vKmhOut").textContent = round(vEff * 3.6, 2) + " km/h";
-
-  // DN standard più vicino
+  // DN standard più vicino a Deq
   let chosenDN = null;
   let minDiff = Infinity;
   for (let i = 0; i < stdDiameters.length; i++) {
