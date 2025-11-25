@@ -67,15 +67,15 @@ body {
 ------------------------------------------------------------- */
 header {
   background: var(--bg-elevated);
-  padding: 10px 12px;
+  padding: 6px 10px;            
   border-radius: 14px;
-  box-shadow: 0 10px 22px var(--shadow-header);
+  box-shadow: 0 8px 18px var(--shadow-header);
   border: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  min-height: 85px;
+  gap: 10px;
+  margin-bottom: 14px;
+  min-height: 70px;             
 }
 
 .app-logo {
@@ -84,18 +84,21 @@ header {
   object-fit: contain;
   border-radius: 12px;
   flex-shrink: 0;
+  margin: 0;
 }
 
 .app-title {
   font-size: 18px;
   font-weight: 700;
-  margin-bottom: 2px;
+  line-height: 1;                
+  margin-bottom: 4px;
 }
 
 .app-subtitle {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
-  margin-top: -2px;
+  margin-top: 0;
+  line-height: 1.1;
 }
 
 /* -------------------------------------------------------------
@@ -116,7 +119,9 @@ header {
   font-weight: 700;
 }
 
-/* INPUT */
+/* -------------------------------------------------------------
+   INPUT
+------------------------------------------------------------- */
 label {
   font-size: 14px;
   font-weight: 600;
@@ -148,7 +153,9 @@ input:focus, select:focus {
   margin-bottom: 8px;
 }
 
-/* BOTTONI */
+/* -------------------------------------------------------------
+   BOTTONI
+------------------------------------------------------------- */
 .btn-primary {
   width: 100%;
   padding: 11px;
@@ -161,7 +168,9 @@ input:focus, select:focus {
   box-shadow: 0 8px 20px rgba(34,197,94,0.45);
 }
 
-/* RISULTATI A DUE RIGHE */
+/* -------------------------------------------------------------
+   RISULTATI A 2 RIGHE
+------------------------------------------------------------- */
 .twoLine {
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
@@ -173,6 +182,7 @@ input:focus, select:focus {
 .twoLine .label {
   font-size: 13px;
   color: var(--text-muted);
+  white-space: normal;
 }
 
 .twoLine .value {
@@ -183,7 +193,7 @@ input:focus, select:focus {
   text-overflow: ellipsis;
 }
 
-/* TAG */
+/* TAG VELOCITÀ */
 .tag {
   white-space: nowrap;
   padding: 2px 8px;
@@ -198,7 +208,9 @@ input:focus, select:focus {
 .tag-high{ background:#f9731630; color:#fb923c; }
 .tag-na  { background:#6b728033; color:#6b7280; }
 
-/* SUGGERIMENTO */
+/* -------------------------------------------------------------
+   SUGGERIMENTO
+------------------------------------------------------------- */
 #suggestCard {
   background:#f9731615;
   border:1px solid #f97316;
@@ -216,7 +228,7 @@ input:focus, select:focus {
 <body>
 <div class="app">
 
-<!-- HEADER CON LINK AL SITO ADS -->
+<!-- HEADER CON LINK -->
 <a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
 <header>
   <img src="logo.png" alt="Logo" class="app-logo">
@@ -227,7 +239,7 @@ input:focus, select:focus {
 </header>
 </a>
 
-<!-- INPUT -->
+<!-- ===================== INPUT ===================== -->
 <div class="card">
   <h2>Input</h2>
 
@@ -271,7 +283,7 @@ input:focus, select:focus {
   <button class="btn-primary" onclick="calcola()">Calcola</button>
 </div>
 
-<!-- RISULTATI -->
+<!-- ===================== RISULTATI ===================== -->
 <div class="card">
   <h2>Risultati</h2>
 
@@ -282,7 +294,10 @@ input:focus, select:focus {
 
   <div class="twoLine">
     <span class="label">Velocità</span>
-    <span class="value"><span id="vEffOut">—</span> <span id="vEffTag" class="tag tag-na">n/d</span></span>
+    <span class="value">
+      <span id="vEffOut">—</span>
+      <span id="vEffTag" class="tag tag-na">n/d</span>
+    </span>
   </div>
 
   <div id="dnBlock">
@@ -330,7 +345,7 @@ input:focus, select:focus {
 
 </div>
 
-<!-- SUGGERIMENTO -->
+<!-- ===================== SUGGERIMENTO ===================== -->
 <div class="card" id="suggestCard" style="display:none;">
   <h2>Suggerimento</h2>
   <div class="twoLine">
@@ -339,6 +354,7 @@ input:focus, select:focus {
   </div>
 </div>
 
+<!-- ===================== SCRIPT ===================== -->
 <script>
 function byId(i){return document.getElementById(i);}
 function round(v,d){return Math.round(v*10**d)/10**d;}
@@ -397,7 +413,7 @@ function calcola(){
 
   let A=null,v=null;
 
-  // RESET
+  /* RESET */
   byId("circOut").style.display="none";
   byId("rectSquareRow").style.display="none";
   byId("rectSquareOut").textContent="—";
@@ -406,9 +422,7 @@ function calcola(){
   byId("baseNote").style.display="none";
   byId("heightNote").style.display="none";
 
-  /* -------------------------------------------------------------
-       SEZIONE RETTANGOLARE
-  ------------------------------------------------------------- */
+  /* RETTANGOLARE */
   if(geom==="rect"){
     const bMm=parseFloat(byId("base").value);
     const hMm=parseFloat(byId("height").value);
@@ -426,17 +440,17 @@ function calcola(){
         h=A/b;
         byId("height").value=round(h*1000,1);
         byId("heightNote").style.display="";
-      } 
+      }
       else if(!hasB && hasH){
         b=A/h;
         byId("base").value=round(b*1000,1);
         byId("baseNote").style.display="";
-      } 
+      }
       else if(!hasB && !hasH){
         const side=Math.sqrt(A)*1000;
         byId("rectSquareRow").style.display="";
         byId("rectSquareOut").textContent=round(side,1)+" mm";
-      } 
+      }
       else {
         A=b*h;
         v=Qs/A;
@@ -452,9 +466,7 @@ function calcola(){
     }
   }
 
-  /* -------------------------------------------------------------
-       SEZIONE CIRCOLARE
-  ------------------------------------------------------------- */
+  /* CIRCOLARE */
   if(geom==="circ"){
     const dMm=parseFloat(byId("diam").value);
     const hasD=dMm>0;
@@ -490,20 +502,21 @@ function calcola(){
 
   if(!A||!v){alert("Errore.");return;}
 
-  /* RISULTATI PRINCIPALI */
-  byId("areaOut").textContent=
+  /* RISULTATI */
+
+  byId("areaOut").textContent =
     round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
 
-  byId("vEffOut").textContent=round(v,2)+" m/s";
+  byId("vEffOut").textContent = round(v,2)+" m/s";
 
-  const tag=getTag(v,scen.vMin,scen.vMax);
-  byId("vEffTag").textContent=tag.text;
-  byId("vEffTag").className="tag "+tag.cls;
+  const tag = getTag(v,scen.vMin,scen.vMax);
+  byId("vEffTag").textContent = tag.text;
+  byId("vEffTag").className = "tag "+tag.cls;
 
-  /* DN rettangolare */
+  /* DN RETTANGOLARE */
   if(geom==="rect"){
-    const Deq=Math.sqrt(4*A/Math.PI)*1000;
-    byId("deqOut").textContent=round(Deq,1)+" mm";
+    const Deq = Math.sqrt(4*A/Math.PI)*1000;
+    byId("deqOut").textContent = round(Deq,1)+" mm";
 
     let best=null,min=1e9;
     for(const dn of stdDiameters){
@@ -521,25 +534,27 @@ function calcola(){
       byId("stdDNOut").textContent="—";
       byId("stdDNVOut").textContent="—";
     }
-  } else {
+  }
+  else {
     byId("deqOut").textContent="—";
     byId("stdDNOut").textContent="—";
     byId("stdDNVOut").textContent="—";
   }
 
-  /* -------------------------------------------------------------
-       SUGGERIMENTO UNI
-  ------------------------------------------------------------- */
+  /* SUGGERIMENTO UNI */
   if(scen.vMax!=null && v>scen.vMax){
-    const vT=(scen.vMin+scen.vMax)/2;
-    const Anew=Qs/vT;
+    const vT = (scen.vMin+scen.vMax)/2;
+    const Anew = Qs / vT;
 
     if(geom==="rect"){
       const side=Math.sqrt(Anew)*1000;
-      byId("suggText").textContent=
-        "Velocità troppo alta. Sezione consigliata ~ "+round(side,1)+" × "+round(side,1)+" mm.";
-    } else {
-      const Deq=Math.sqrt(4*Anew/Math.PI)*1000;
+      byId("suggText").textContent =
+        "Velocità troppo alta. Sezione consigliata ~ " +
+        round(side,1)+" × "+round(side,1)+" mm.";
+    }
+
+    else {
+      const Deq = Math.sqrt(4*Anew/Math.PI)*1000;
       let best=null,min=1e9;
       for(const dn of stdDiameters){
         if(Math.abs(dn-Deq)<min){
@@ -548,10 +563,13 @@ function calcola(){
         }
       }
       const Astd=Math.PI*(best/1000)**2/4;
-      const v2=Qs/Astd;
-      byId("suggText").textContent=
-        "Velocità troppo alta. Suggerito DN "+best+" mm (V≈"+round(v2,2)+" m/s).";
+      const v2 = Qs/Astd;
+
+      byId("suggText").textContent =
+        "Velocità troppo alta. Suggerito DN "+best+" mm (V≈"+
+        round(v2,2)+" m/s).";
     }
+
     byId("suggestCard").style.display="";
   }
 }
