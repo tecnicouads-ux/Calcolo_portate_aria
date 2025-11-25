@@ -4,13 +4,10 @@
   <meta charset="UTF-8">
   <title>Calcolo Portate Aria</title>
 
-  <!-- VIEWPORT AGGIORNATO (Fix notch) -->
+  <!-- VIEWPORT con fix notch -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-
   <!-- iOS WebApp -->
   <meta name="apple-mobile-web-app-capable" content="yes">
-
-  <!-- FIX STATUS BAR iPHONE -->
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#020617">
 
@@ -51,7 +48,7 @@ html[data-theme="light"] {
 }
 
 /* -------------------------------------------------------------
-   STRUTTURA BASE — FIX SFONDO NOTCH
+   STRUTTURA BASE
 ------------------------------------------------------------- */
 html, body {
   margin: 0;
@@ -75,7 +72,7 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER CON LOGO ADS
+   HEADER
 ------------------------------------------------------------- */
 header {
   background: var(--bg-elevated);
@@ -170,7 +167,7 @@ input:focus, select:focus {
   margin-bottom: 8px;
 }
 
-/* Bottone mostra/nascondi limiti UNI */
+/* link "Mostra limiti UNI" */
 .link-button {
   background: none;
   border: none;
@@ -182,19 +179,22 @@ input:focus, select:focus {
   text-align: left;
 }
 
-/* Tabella limiti UNI con bordo esterno */
+/* riquadro limiti UNI */
 #uniDetails {
   border: 1px solid var(--border-soft);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 6px;
-  margin-bottom: 14px;
-  background: rgba(255,255,255,0.02);
+  margin-top: 4px;
+  margin-bottom: 8px;
+  background: var(--bg-elevated);
 }
 
+/* tabella limiti UNI */
 .uni-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
+  margin-top: 2px;
 }
 
 .uni-table th,
@@ -273,6 +273,22 @@ input:focus, select:focus {
 .tag-na  { background:#6b728033; color:#6b7280; }
 
 /* -------------------------------------------------------------
+   ANTEPRIMA SEZIONE
+------------------------------------------------------------- */
+.preview-box {
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 6px;
+}
+
+#sectionPreview {
+  width: 100%;
+  max-height: 220px;
+  display: block;
+}
+
+/* -------------------------------------------------------------
    SUGGERIMENTO
 ------------------------------------------------------------- */
 #suggestCard {
@@ -299,7 +315,7 @@ input:focus, select:focus {
   </div>
 </header>
 
-<!-- ========================================== INPUT ========================================== -->
+<!-- ===================== INPUT ===================== -->
 <div class="card">
   <h2>Input</h2>
 
@@ -320,7 +336,6 @@ input:focus, select:focus {
   </select>
 
   <button type="button" class="link-button" onclick="toggleUni()">Mostra / Nascondi limiti UNI</button>
-
   <div id="uniDetails" style="display:none;">
     <table class="uni-table">
       <thead>
@@ -349,9 +364,11 @@ input:focus, select:focus {
   <div id="rect_fields">
     <label>Base (mm)</label>
     <input id="base" type="number" inputmode="decimal">
+    <div id="baseNote" class="auto-note" style="display:none;">Calcolato automaticamente</div>
 
     <label>Altezza (mm)</label>
     <input id="height" type="number" inputmode="decimal">
+    <div id="heightNote" class="auto-note" style="display:none;">Calcolato automaticamente</div>
   </div>
 
   <div id="circ_fields" style="display:none;">
@@ -363,7 +380,7 @@ input:focus, select:focus {
   <button class="btn-secondary" type="button" onclick="resetForm()">Nuovo calcolo / Reset</button>
 </div>
 
-<!-- ========================================== RISULTATI ========================================== -->
+<!-- ===================== RISULTATI ===================== -->
 <div class="card" id="resultsCard">
   <h2>Risultati</h2>
 
@@ -415,7 +432,19 @@ input:focus, select:focus {
   </div>
 </div>
 
-<!-- ========================================== SUGGERIMENTO ========================================== -->
+<!-- ===================== ANTEPRIMA SEZIONE ===================== -->
+<div class="card" id="previewCard" style="display:none;">
+  <h2>Anteprima sezione</h2>
+  <div class="preview-box">
+    <svg id="sectionPreview" viewBox="0 0 200 200"></svg>
+  </div>
+  <div class="twoLine">
+    <span class="label" id="previewLabel">—</span>
+    <span class="value" id="previewSize">—</span>
+  </div>
+</div>
+
+<!-- ===================== SUGGERIMENTO ===================== -->
 <div class="card" id="suggestCard" style="display:none;">
   <h2>Suggerimento</h2>
   <div class="twoLine">
@@ -424,7 +453,7 @@ input:focus, select:focus {
   </div>
 </div>
 
-<!-- ========================================== SCRIPT ========================================== -->
+<!-- ===================== SCRIPT ===================== -->
 <script>
 function byId(i){return document.getElementById(i);}
 function round(v,d){return Math.round(v*10**d)/10**d;}
@@ -446,24 +475,55 @@ const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
   document.documentElement.setAttribute("data-theme",(h>=7&&h<19)?"light":"dark");
 })();
 
+/* Toggle sezione */
+document.addEventListener("DOMContentLoaded",()=>{
+  const geom=byId("geom");
+  geom.addEventListener("change",()=>{
+    if(geom.value==="rect"){
+      byId("rect_fields").style.display="";
+      byId("circ_fields").style.display="none";
+      byId("dnBlock").style.display="";
+    } else {
+      byId("rect_fields").style.display="none";
+      byId("circ_fields").style.display="";
+      byId("dnBlock").style.display="none";
+    }
+    byId("circOut").style.display="none";
+  });
+});
+
+/* Mostra / nascondi limiti UNI */
 function toggleUni(){
-  const box=byId("uniDetails");
-  box.style.display = box.style.display==="none" ? "block" : "none";
+  const box = byId("uniDetails");
+  if(!box) return;
+  box.style.display = (box.style.display==="none" || box.style.display==="") ? "block" : "none";
 }
 
+/* Tag velocità */
+function getTag(v,min,max){
+  if(min==null) return {text:"n/d",cls:"tag-na"};
+  if(v<min) return {text:"Bassa",cls:"tag-low"};
+  if(v<=max) return {text:"OK",cls:"tag-ok"};
+  return {text:"Alta",cls:"tag-high"};
+}
+
+/* Reset form */
 function resetForm(){
   ["flow_m3h","velocity","base","height","diam"].forEach(id=>{
     const el=byId(id);
     if(el) el.value="";
   });
 
+  byId("scenario").value="res";
   byId("geom").value="rect";
+
   byId("rect_fields").style.display="";
   byId("circ_fields").style.display="none";
   byId("dnBlock").style.display="";
 
   ["areaOut","vEffOut","stdDNOut","stdDNVOut","rectSquareOut",
-   "squareSideOut","circDNOut","circDNVOut","suggText"].forEach(id=>{
+   "squareSideOut","circDNOut","circDNVOut","suggText",
+   "previewLabel","previewSize"].forEach(id=>{
     byId(id).textContent="—";
   });
 
@@ -473,23 +533,101 @@ function resetForm(){
   byId("rectSquareRow").style.display="none";
   byId("circOut").style.display="none";
   byId("suggestCard").style.display="none";
+  const uniBox=byId("uniDetails");
+  if(uniBox) uniBox.style.display="none";
 
-  byId("uniDetails").style.display="none";
+  // note automatiche
+  const bn=byId("baseNote");
+  const hn=byId("heightNote");
+  if(bn) bn.style.display="none";
+  if(hn) hn.style.display="none";
+
+  // nascondi anteprima
+  const pc=byId("previewCard");
+  if(pc) pc.style.display="none";
 
   window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function getTag(v,min,max){
-  if(min==null) return {text:"n/d",cls:"tag-na"};
-  if(v<min) return {text:"Bassa",cls:"tag-low"};
-  if(v<=max) return {text:"OK",cls:"tag-ok"};
-  return {text:"Alta",cls:"tag-high"};
+/* Anteprima grafica sezione */
+function updatePreview(type, Wmm, Hmm, Dmm){
+  const card = byId("previewCard");
+  const svg  = byId("sectionPreview");
+  const label = byId("previewLabel");
+  const size  = byId("previewSize");
+
+  if(!card || !svg || !label || !size){
+    return;
+  }
+
+  // nessun dato valido → nascondo
+  if(!type || (type==="rect" && (!Wmm || !Hmm)) || (type==="circ" && !Dmm)){
+    card.style.display="none";
+    svg.innerHTML="";
+    label.textContent="—";
+    size.textContent="—";
+    return;
+  }
+
+  // pulisci
+  svg.innerHTML="";
+  const ns="http://www.w3.org/2000/svg";
+
+  if(type==="rect"){
+    const w = Wmm;
+    const h = Hmm;
+    const maxDim = Math.max(w,h);
+    const scale = maxDim>0 ? 140/maxDim : 1;
+    const drawW = w*scale;
+    const drawH = h*scale;
+    const x = (200-drawW)/2;
+    const y = (200-drawH)/2;
+
+    const rect = document.createElementNS(ns,"rect");
+    rect.setAttribute("x", x);
+    rect.setAttribute("y", y);
+    rect.setAttribute("width", drawW);
+    rect.setAttribute("height", drawH);
+    rect.setAttribute("rx","8");
+    rect.setAttribute("ry","8");
+    rect.setAttribute("fill","none");
+    rect.setAttribute("stroke","#22c55e");
+    rect.setAttribute("stroke-width","3");
+    svg.appendChild(rect);
+
+    label.textContent="Sezione rettangolare";
+    size.textContent="≈ "+round(Wmm,1)+" × "+round(Hmm,1)+" mm";
+  }
+
+  if(type==="circ"){
+    const d = Dmm;
+    const scale = d>0 ? 140/d : 1;
+    const r = (d*scale)/2;
+    const cx = 100;
+    const cy = 100;
+
+    const circle = document.createElementNS(ns,"circle");
+    circle.setAttribute("cx",cx);
+    circle.setAttribute("cy",cy);
+    circle.setAttribute("r",r);
+    circle.setAttribute("fill","none");
+    circle.setAttribute("stroke","#22c55e");
+    circle.setAttribute("stroke-width","3");
+    svg.appendChild(circle);
+
+    label.textContent="Sezione circolare";
+    size.textContent="Ø ≈ "+round(Dmm,1)+" mm";
+  }
+
+  card.style.display="block";
 }
 
+/* CALCOLO PRINCIPALE */
 function calcola(){
   const Qm=parseFloat(byId("flow_m3h").value);
   let Q=null;
-  if(!isNaN(Qm)&&Qm>0) Q=Qm;
+  if(!isNaN(Qm) && Qm>0) Q=Qm;
+
   if(!Q){alert("Inserisci una portata Q (m³/h) > 0");return;}
 
   const V_in=parseFloat(byId("velocity").value);
@@ -497,15 +635,24 @@ function calcola(){
   const scen=scenarios[byId("scenario").value];
   const Qs=Q/3600;
 
-  let A=null,v=null;
+  let A=null, v=null;
 
-  /* RESET */
+  // per anteprima
+  let previewType=null;
+  let previewWmm=null;
+  let previewHmm=null;
+  let previewDmm=null;
+
+  // reset parziale
   byId("circOut").style.display="none";
   byId("rectSquareRow").style.display="none";
   byId("suggText").textContent="—";
   byId("suggestCard").style.display="none";
-  byId("baseNote").style.display="none";
-  byId("heightNote").style.display="none";
+
+  const bn=byId("baseNote");
+  const hn=byId("heightNote");
+  if(bn) bn.style.display="none";
+  if(hn) hn.style.display="none";
 
   /* RETTANGOLARE */
   if(geom==="rect"){
@@ -513,31 +660,55 @@ function calcola(){
     const hMm=parseFloat(byId("height").value);
     let b=bMm?bMm/1000:null;
     let h=hMm?hMm/1000:null;
-    const hasB=!!b, hasH=!!h;
+    const hasB=!!b;
+    const hasH=!!h;
 
     if(V_in){
-      A=Qs/V_in; v=V_in;
+      A=Qs/V_in;
+      v=V_in;
+
       if(hasB && !hasH){
         h=A/b;
         byId("height").value=round(h*1000,1);
-        byId("heightNote").style.display="";
-      } else if(!hasB && hasH){
+        if(hn) hn.style.display="";
+        previewType="rect";
+        previewWmm=b*1000;
+        previewHmm=h*1000;
+      }
+      else if(!hasB && hasH){
         b=A/h;
         byId("base").value=round(b*1000,1);
-        byId("baseNote").style.display="";
-      } else if(!hasB && !hasH){
+        if(bn) bn.style.display="";
+        previewType="rect";
+        previewWmm=b*1000;
+        previewHmm=h*1000;
+      }
+      else if(!hasB && !hasH){
         const side=Math.sqrt(A)*1000;
         byId("rectSquareRow").style.display="";
         byId("rectSquareOut").textContent=round(side,1)+" mm";
-      } else {
-        A=b*h; v=Qs/A;
+        previewType="rect";
+        previewWmm=side;
+        previewHmm=side;
       }
+      else {
+        A=b*h;
+        v=Qs/A;
+        previewType="rect";
+        previewWmm=b*1000;
+        previewHmm=h*1000;
+      }
+
     } else {
       if(!hasB || !hasH){
-        alert("Se V non è nota, inserisci base e altezza.");
+        alert("Se la velocità non è nota, inserisci sia base che altezza.");
         return;
       }
-      A=b*h; v=Qs/A;
+      A=b*h;
+      v=Qs/A;
+      previewType="rect";
+      previewWmm=b*1000;
+      previewHmm=h*1000;
     }
   }
 
@@ -547,7 +718,8 @@ function calcola(){
     const hasD=dMm>0;
 
     if(V_in){
-      A=Qs/V_in; v=V_in;
+      A=Qs/V_in;
+      v=V_in;
     } else {
       if(!hasD){alert("Se V è sconosciuta, inserisci diametro.");return;}
       const d=dMm/1000;
@@ -559,66 +731,107 @@ function calcola(){
     const side=Math.sqrt(A)*1000;
     byId("squareSideOut").textContent=round(side,1)+" mm";
 
+    if(hasD){
+      previewType="circ";
+      previewDmm=dMm;
+    }
+
     if(V_in && !hasD){
       const Deq=Math.sqrt(4*A/Math.PI)*1000;
       let best=null,min=1e9;
       for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq)<min){min=Math.abs(dn-Deq);best=dn;}
+        if(Math.abs(dn-Deq)<min){
+          min=Math.abs(dn-Deq);
+          best=dn;
+        }
       }
       byId("circDNOut").textContent="DN "+best+" mm";
       const Astd=Math.PI*(best/1000)**2/4;
       byId("circDNVOut").textContent=round(Qs/Astd,2)+" m/s";
+
+      // anteprima con DN consigliato
+      previewType="circ";
+      previewDmm=best;
     }
   }
 
-  if(!A||!v){alert("Errore.");return;}
-
-  byId("areaOut").textContent=round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
-  byId("vEffOut").textContent=round(v,2)+" m/s";
-
-  const tag=getTag(v,scen.vMin,scen.vMax);
-  byId("vEffTag").textContent=tag.text;
-  byId("vEffTag").className="tag "+tag.cls;
-
-  /* DIAMETRO EQUIVALENTE */
-  const Deq=Math.sqrt(4*A/Math.PI)*1000;
-  let best=null,min=1e9;
-  for(const dn of stdDiameters){
-    if(Math.abs(dn-Deq)<min){min=Math.abs(dn-Deq);best=dn;}
+  if(!A || !v){
+    alert("Errore.");
+    updatePreview(null,null,null,null);
+    return;
   }
 
-  if(geom==="rect" && best){
-    byId("stdDNOut").textContent="Ø "+best+" mm";
-    const Astd=Math.PI*(best/1000)**2/4;
-    byId("stdDNVOut").textContent=round(Qs/Astd,2)+" m/s";
+  // RISULTATI
+  byId("areaOut").textContent =
+    round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
+
+  byId("vEffOut").textContent = round(v,2)+" m/s";
+
+  const tag = getTag(v,scen.vMin,scen.vMax);
+  byId("vEffTag").textContent = tag.text;
+  byId("vEffTag").className = "tag "+tag.cls;
+
+  // DIAMETRO EQUIVALENTE (solo rettangolare)
+  if(geom==="rect"){
+    const Deq = Math.sqrt(4*A/Math.PI)*1000;
+    let best=null,min=1e9;
+    for(const dn of stdDiameters){
+      if(Math.abs(dn-Deq)<min){
+        min=Math.abs(dn-Deq);
+        best=dn;
+      }
+    }
+
+    if(best){
+      byId("stdDNOut").textContent = "Ø "+best+" mm";
+      const Astd=Math.PI*(best/1000)**2/4;
+      byId("stdDNVOut").textContent = round(Qs/Astd,2)+" m/s";
+    } else {
+      byId("stdDNOut").textContent="—";
+      byId("stdDNVOut").textContent="—";
+    }
   } else {
     byId("stdDNOut").textContent="—";
     byId("stdDNVOut").textContent="—";
   }
 
-  /* SUGGERIMENTO UNI */
+  // SUGGERIMENTO UNI
   if(scen.vMax!=null && v>scen.vMax){
-    const vT=(scen.vMin+scen.vMax)/2;
-    const Anew=Qs/vT;
+    const vT = (scen.vMin+scen.vMax)/2;
+    const Anew = Qs / vT;
 
     if(geom==="rect"){
       const side=Math.sqrt(Anew)*1000;
-      byId("suggText").textContent="Velocità troppo alta. Sezione consigliata ~ "+round(side,1)+" × "+round(side,1)+" mm.";
+      byId("suggText").textContent =
+        "Velocità troppo alta. Sezione consigliata ~ " +
+        round(side,1)+" × "+round(side,1)+" mm.";
     } else {
-      const Deq2=Math.sqrt(4*Anew/Math.PI)*1000;
+      const Deq2 = Math.sqrt(4*Anew/Math.PI)*1000;
       let best2=null,min2=1e9;
       for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq2)<min2){min2=Math.abs(dn-Deq2);best2=dn;}
+        if(Math.abs(dn-Deq2)<min2){
+          min2=Math.abs(dn-Deq2);
+          best2=dn;
+        }
       }
       const Astd2=Math.PI*(best2/1000)**2/4;
-      const vv=Qs/Astd2;
-      byId("suggText").textContent="Velocità troppo alta. Suggerito Ø "+best2+" mm (V≈"+round(vv,2)+" m/s).";
+      const v2 = Qs/Astd2;
+      byId("suggText").textContent =
+        "Velocità troppo alta. Suggerito Ø "+best2+" mm (V≈"+
+        round(v2,2)+" m/s).";
     }
 
     byId("suggestCard").style.display="";
   }
 
-  byId("resultsCard").scrollIntoView({behavior:"smooth",block:"start"});
+  // ANTEPRIMA GRAFICA
+  updatePreview(previewType, previewWmm, previewHmm, previewDmm);
+
+  // Scroll ai risultati
+  const resCard = byId("resultsCard");
+  if(resCard && resCard.scrollIntoView){
+    resCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 </script>
 
