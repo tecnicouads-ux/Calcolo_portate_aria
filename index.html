@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Calcolo Canale Aria</title>
+  <title>Calcolo Portate Aria</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
@@ -63,31 +63,40 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER CON LOGO
+   HEADER COMPATTO + LOGO 80PX
 ------------------------------------------------------------- */
 header {
   background: var(--bg-elevated);
-  padding: 12px;
-  border-radius: 16px;
-  box-shadow: 0 14px 28px var(--shadow-header);
+  padding: 10px 12px;
+  border-radius: 14px;
+  box-shadow: 0 10px 22px var(--shadow-header);
   border: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
+  min-height: 85px;
 }
 
-/* LOGO 80PX */
 .app-logo {
   width: 80px;
   height: 80px;
   object-fit: contain;
-  border-radius: 14px;
+  border-radius: 12px;
   flex-shrink: 0;
 }
 
-.app-title { font-size: 20px; font-weight: 700; }
-.app-subtitle { font-size: 13px; color: var(--text-muted); }
+.app-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.app-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: -2px;
+}
 
 /* -------------------------------------------------------------
    CARD
@@ -164,7 +173,6 @@ input:focus, select:focus {
 .twoLine .label {
   font-size: 13px;
   color: var(--text-muted);
-  white-space: normal;
 }
 
 .twoLine .value {
@@ -208,13 +216,16 @@ input:focus, select:focus {
 <body>
 <div class="app">
 
+<!-- HEADER CON LINK AL SITO ADS -->
+<a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
 <header>
   <img src="logo.png" alt="Logo" class="app-logo">
-  <div>
-    <div class="app-title">Calcolo Canale Aria</div>
-    <div class="app-subtitle">HVAC · portata · DN · velocità</div>
+  <div style="display:flex; flex-direction:column; justify-content:center;">
+    <div class="app-title">Calcolo Portate Aria</div>
+    <div class="app-subtitle">Air Distribution Systems</div>
   </div>
 </header>
+</a>
 
 <!-- INPUT -->
 <div class="card">
