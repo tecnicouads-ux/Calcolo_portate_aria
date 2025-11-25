@@ -133,19 +133,19 @@
     <h2>Input</h2>
 
     <label>Portata Q (m³/h)</label>
-    <input id="flow" type="number" placeholder="es. 1200">
+    <input id="flow" type="number">
 
     <label>Velocità V (m/s) (opzionale)</label>
-    <input id="velocity" type="number" placeholder="es. 4 (lascia vuoto se non la sai)">
+    <input id="velocity" type="number">
 
-    <label>Scenario impianto (limiti velocità)</label>
+    <label>Scenario impianto</label>
     <select id="scenario">
       <option value="res">Abitazione – mandata</option>
       <option value="office">Uffici – mandata</option>
       <option value="hospital">Ospedale – mandata</option>
       <option value="extract">Estrazione / cucine</option>
       <option value="main">Montante principale</option>
-      <option value="none">Nessun limite (libero)</option>
+      <option value="none">Nessun limite</option>
     </select>
     <div class="note" id="scenarioInfo"></div>
 
@@ -159,18 +159,18 @@
       <div class="row-2">
         <div>
           <label>Base (mm)</label>
-          <input id="base" type="number" placeholder="es. 400">
+          <input id="base" type="number">
         </div>
         <div>
           <label>Altezza (mm)</label>
-          <input id="height" type="number" placeholder="es. 200">
+          <input id="height" type="number">
         </div>
       </div>
     </div>
 
     <div id="circ_fields" style="display:none;">
       <label>Diametro (mm)</label>
-      <input id="diam" type="number" placeholder="es. 250">
+      <input id="diam" type="number">
     </div>
 
     <button class="btn-primary" onclick="calcola()">Calcola</button>
@@ -180,27 +180,21 @@
   <div class="card">
     <h2>Risultati</h2>
     <div class="results">
-      <div>Area A:
-        <span id="areaOut">—</span>
-      </div>
+      <div>Area A: <span id="areaOut">—</span></div>
       <div>Velocità considerata V:
         <span id="vEffOut">—</span>
         <span id="vEffTag" class="tag tag-na">n/d</span>
       </div>
 
-      <!-- Blocco DN / Deq: visibile solo in rettangolare -->
+      <!-- BLOCCO DN/DEQ SOLO PER RETTANGOLARE -->
       <div id="dnBlock">
-        <div>Diametro equivalente Deq (da A): <span id="deqOut">—</span></div>
+        <div>Diametro equivalente Deq: <span id="deqOut">—</span></div>
         <div>DN standard più vicino: <span id="stdDNOut">—</span></div>
         <div>Velocità con DN standard: <span id="stdDNVOut">—</span></div>
       </div>
 
-      <!-- Blocco extra solo per circolare -->
+      <!-- BLOCCO CIRCOLARE (solo lato quadrato equivalente) -->
       <div id="circOut" style="display:none;">
-        <div>Velocità con diametro inserito:
-          <span id="vRealOut">—</span>
-          <span id="vRealTag" class="tag tag-na">n/d</span>
-        </div>
         <div>Sezione quadrata equivalente (lato): <span id="squareSideOut">—</span></div>
       </div>
     </div>
@@ -217,235 +211,129 @@
   </div>
 
 <script>
-function round(v, d) {
-  return Math.round(v * Math.pow(10, d)) / Math.pow(10, d);
-}
+function round(v,d){return Math.round(v*10**d)/10**d;}
 
-const scenarios = {
-  res:      { name: "Abitazione – mandata",      vMin: 1.5, vMax: 3.5 },
-  office:   { name: "Uffici – mandata",          vMin: 2.0, vMax: 4.0 },
-  hospital: { name: "Ospedale – mandata",        vMin: 1.5, vMax: 3.0 },
-  extract:  { name: "Estrazione / cucine",       vMin: 5.0, vMax: 8.0 },
-  main:     { name: "Montante principale",       vMin: 6.0, vMax: 9.0 },
-  none:     { name: "Nessun limite",             vMin: null, vMax: null }
+const scenarios={
+  res:{vMin:1.5,vMax:3.5},
+  office:{vMin:2.0,vMax:4.0},
+  hospital:{vMin:1.5,vMax:3.0},
+  extract:{vMin:5.0,vMax:8.0},
+  main:{vMin:6.0,vMax:9.0},
+  none:{vMin:null,vMax:null}
 };
 
-// diametri standard usati
-const stdDiameters = [100, 125, 150, 160, 200, 250, 315, 355, 400, 450, 500, 560, 600];
+const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
 
-document.addEventListener("DOMContentLoaded", function() {
-  const geomSel = document.getElementById("geom");
-  const rectFields = document.getElementById("rect_fields");
-  const circFields = document.getElementById("circ_fields");
-  const scenSel = document.getElementById("scenario");
-  const scenInfo = document.getElementById("scenarioInfo");
-  const dnBlock = document.getElementById("dnBlock");
+document.addEventListener("DOMContentLoaded",()=>{
+  const geomSel=document.getElementById("geom");
+  const rect=document.getElementById("rect_fields");
+  const circ=document.getElementById("circ_fields");
+  const dnBlock=document.getElementById("dnBlock");
 
-  function updateScenarioInfo() {
-    const s = scenarios[scenSel.value];
-    if (s.vMin != null && s.vMax != null) {
-      scenInfo.textContent = s.name + " – range consigliato: " + s.vMin + " – " + s.vMax + " m/s";
-    } else {
-      scenInfo.textContent = s.name + " – nessun limite preimpostato";
+  geomSel.addEventListener("change",()=>{
+    if(geomSel.value==="rect"){
+      rect.style.display="";
+      circ.style.display="none";
+      dnBlock.style.display="";
+      document.getElementById("circOut").style.display="none";
+    }else{
+      rect.style.display="none";
+      circ.style.display="";
+      dnBlock.style.display="none";
     }
-  }
-  scenSel.addEventListener("change", updateScenarioInfo);
-  updateScenarioInfo();
-
-  geomSel.addEventListener("change", function() {
-    if (geomSel.value === "rect") {
-      rectFields.style.display = "";
-      circFields.style.display = "none";
-      dnBlock.style.display = "";
-    } else {
-      rectFields.style.display = "none";
-      circFields.style.display = "";
-      dnBlock.style.display = "none";
-    }
-    document.getElementById("circOut").style.display = "none";
   });
 });
 
-function getVelocityTag(v, vMin, vMax) {
-  if (!v || v <= 0 || vMin == null || vMax == null) {
-    return { text: "n/d", cls: "tag-na" };
-  }
-  if (v < vMin) return { text: "Bassa", cls: "tag-low" };
-  if (v <= vMax) return { text: "OK", cls: "tag-ok" };
-  return { text: "Alta", cls: "tag-high" };
+function getTag(v,min,max){
+  if(min==null)return{text:"n/d",cls:"tag-na"};
+  if(v<min)return{text:"Bassa",cls:"tag-low"};
+  if(v<=max)return{text:"OK",cls:"tag-ok"};
+  return{text:"Alta",cls:"tag-high"};
 }
 
-function calcola() {
-  const Q = parseFloat(document.getElementById("flow").value);
-  const V_input = parseFloat(document.getElementById("velocity").value);
-  const geom = document.getElementById("geom").value;
-  const scenKey = document.getElementById("scenario").value;
-  const scen = scenarios[scenKey];
+function calcola(){
+  const Q=parseFloat(flow.value);
+  const V=parseFloat(velocity.value);
+  const geom=geomSel.value;
 
-  const circOut = document.getElementById("circOut");
-  const vEffTagEl = document.getElementById("vEffTag");
-  const vRealTagEl = document.getElementById("vRealTag");
-  const dnBlock = document.getElementById("dnBlock");
+  const dnBlock=document.getElementById("dnBlock");
+  const circOut=document.getElementById("circOut");
 
-  circOut.style.display = "none";
-  vEffTagEl.textContent = "n/d";
-  vEffTagEl.className = "tag tag-na";
-  vRealTagEl.textContent = "n/d";
-  vRealTagEl.className = "tag tag-na";
+  circOut.style.display="none";
+  dnBlock.style.display=(geom==="rect")?"":"none";
 
-  if (!Q || Q <= 0) {
-    alert("Inserisci portata Q > 0");
-    return;
-  }
+  if(!Q){alert("Portata mancante");return;}
 
-  let A = null;      // area m²
-  let vEff = null;   // velocità effettiva
-  const Q_m3s = Q / 3600;
+  let A,vEff;
+  const Qs=Q/3600;
 
-  // Rettangolare
-  if (geom === "rect") {
-    let baseMm = parseFloat(document.getElementById("base").value);
-    let heightMm = parseFloat(document.getElementById("height").value);
-    let baseM = baseMm ? baseMm / 1000 : null;
-    let heightM = heightMm ? heightMm / 1000 : null;
+  if(geom==="rect"){
+    const b=parseFloat(base.value)/1000||null;
+    const h=parseFloat(height.value)/1000||null;
 
-    dnBlock.style.display = ""; // mostra blocco DN/Deq in rettangolare
-
-    if (V_input && V_input > 0) {
-      // Dimensionamento: Q + V -> A
-      A = Q_m3s / V_input;
-      vEff = V_input;
-
-      if (baseM && !heightM) {
-        heightM = A / baseM;
-        heightMm = heightM * 1000;
-      } else if (!baseM && heightM) {
-        baseM = A / heightM;
-        baseMm = baseM * 1000;
-      }
-
-    } else {
-      // Verifica: Q + sezione -> V
-      if (!baseM || !heightM) {
-        alert("Se la velocità non è nota, per sezione rettangolare devi inserire sia base che altezza.");
-        return;
-      }
-      A = baseM * heightM;
-      vEff = Q_m3s / A;
+    if(V){
+      A=Qs/V;
+      vEff=V;
+    }else{
+      if(!b||!h){alert("Base e altezza obbligatorie");return;}
+      A=b*h;
+      vEff=Qs/A;
     }
   }
 
-  // Circolare
-  if (geom === "circ") {
-    let dInputMm = parseFloat(document.getElementById("diam").value);
-    let D_ins_m = dInputMm ? dInputMm / 1000 : null;
+  if(geom==="circ"){
+    const dMm=parseFloat(diam.value);
+    if(!dMm){alert("Diametro obbligatorio");return;}
+    const d=dMm/1000;
 
-    dnBlock.style.display = "none"; // nascondi Deq/DN/Vstd in circolare
-
-    if (V_input && V_input > 0) {
-      // Dimensionamento: Q + V -> A
-      A = Q_m3s / V_input;
-      vEff = V_input;
-
-      if (dInputMm && dInputMm > 0) {
-        circOut.style.display = "";
-        const A_ins = Math.PI * Math.pow(D_ins_m, 2) / 4;
-        const V_real = Q_m3s / A_ins;
-        document.getElementById("vRealOut").textContent =
-          round(V_real, 2) + " m/s";
-
-        const side_m = Math.sqrt(A_ins);
-        const side_mm = side_m * 1000;
-        document.getElementById("squareSideOut").textContent =
-          round(side_mm, 1) + " mm";
-
-        const vRealTag = getVelocityTag(V_real, scen.vMin, scen.vMax);
-        vRealTagEl.textContent = vRealTag.text;
-        vRealTagEl.className = "tag " + vRealTag.cls;
-      } else {
-        circOut.style.display = "none";
-      }
-
-    } else {
-      // Verifica: Q + D -> A, V
-      if (!D_ins_m) {
-        alert("Se la velocità non è nota, per sezione circolare devi inserire il diametro.");
-        return;
-      }
-      circOut.style.display = "";
-      const A_ins = Math.PI * Math.pow(D_ins_m, 2) / 4;
-      A = A_ins;
-      vEff = Q_m3s / A_ins;
-
-      document.getElementById("vRealOut").textContent =
-        round(vEff, 2) + " m/s";
-
-      const side_m = Math.sqrt(A_ins);
-      const side_mm = side_m * 1000;
-      document.getElementById("squareSideOut").textContent =
-        round(side_mm, 1) + " mm";
-
-      const vRealTag = getVelocityTag(vEff, scen.vMin, scen.vMax);
-      vRealTagEl.textContent = vRealTag.text;
-      vRealTagEl.className = "tag " + vRealTag.cls;
+    if(V){
+      A=Qs/V;
+      vEff=V;
+    }else{
+      A=Math.PI*(d**2)/4;
+      vEff=Qs/A;
     }
+
+    circOut.style.display="";
+    const side=Math.sqrt(A)*1000;
+    squareSideOut.textContent=round(side,1)+" mm";
   }
 
-  if (!A || !vEff || A <= 0 || vEff <= 0) {
-    alert("Impossibile determinare correttamente area e velocità. Controlla i dati.");
-    return;
-  }
+  if(!A){alert("Errore calcolo A");return;}
 
-  // Area in m² e mm²
-  const A_mm2 = A * 1_000_000;
-  document.getElementById("areaOut").textContent =
-    round(A, 4) + " m² (" + round(A_mm2, 0) + " mm²)";
+  // Area
+  areaOut.textContent=round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
 
-  // conversioni
-  document.getElementById("qM3sOut").textContent = round(Q_m3s, 4);
-  document.getElementById("areaCm2Out").textContent = round(A * 10000, 1);
-  document.getElementById("vKmhOut").textContent = round(vEff * 3.6, 2) + " km/h";
+  // Velocità
+  vEffOut.textContent=round(vEff,2)+" m/s";
+  const sc=scenarios[scenario.value];
+  const tag=getTag(vEff,sc.vMin,sc.vMax);
+  vEffTag.textContent=tag.text;
+  vEffTag.className="tag "+tag.cls;
 
-  document.getElementById("vEffOut").textContent = round(vEff, 2) + " m/s";
-  const vEffTag = getVelocityTag(vEff, scen.vMin, scen.vMax);
-  vEffTagEl.textContent = vEffTag.text;
-  vEffTagEl.className = "tag " + vEffTag.cls;
+  // Conversioni
+  qM3sOut.textContent=round(Qs,4);
+  areaCm2Out.textContent=round(A*10000,1);
+  vKmhOut.textContent=round(vEff*3.6,2);
 
-  // Sezione rettangolare → calcolo Deq/DN/Vstd (solo se rettangolare)
-  if (geom === "rect") {
-    const Deq_m = Math.sqrt(4 * A / Math.PI);
-    const Deq_mm = Deq_m * 1000;
-    document.getElementById("deqOut").textContent = round(Deq_mm, 1) + " mm";
+  // DN / Deq SOLO se rettangolare
+  if(geom==="rect"){
+    const Deq=Math.sqrt(4*A/Math.PI)*1000;
+    deqOut.textContent=round(Deq,1)+" mm";
 
-    // DN standard più vicino a Deq
-    let chosenDN = null;
-    let minDiff = Infinity;
-    for (let i = 0; i < stdDiameters.length; i++) {
-      const diff = Math.abs(stdDiameters[i] - Deq_mm);
-      if (diff < minDiff) {
-        minDiff = diff;
-        chosenDN = stdDiameters[i];
-      }
+    let best=null,min=1e9;
+    for(const dn of stdDiameters){
+      let diff=Math.abs(dn-Deq);
+      if(diff<min){min=diff;best=dn;}
     }
 
-    if (chosenDN) {
-      const D_chosen_m = chosenDN / 1000;
-      const A_chosen = Math.PI * Math.pow(D_chosen_m, 2) / 4;
-      const V_chosen = Q_m3s / A_chosen;
-
-      document.getElementById("stdDNOut").textContent =
-        "DN " + chosenDN + " mm";
-      document.getElementById("stdDNVOut").textContent =
-        round(V_chosen, 2) + " m/s";
-    } else {
-      document.getElementById("stdDNOut").textContent = "—";
-      document.getElementById("stdDNVOut").textContent = "—";
-    }
-  } else {
-    // se circolare, svuoto i testi DN/Deq giusto per non lasciare residui logici
-    document.getElementById("deqOut").textContent = "—";
-    document.getElementById("stdDNOut").textContent = "—";
-    document.getElementById("stdDNVOut").textContent = "—";
+    stdDNOut.textContent="DN "+best;
+    const Astd=Math.PI*(best/1000)**2/4;
+    stdDNVOut.textContent=round(Qs/Astd,2)+" m/s";
+  }else{
+    deqOut.textContent="—";
+    stdDNOut.textContent="—";
+    stdDNVOut.textContent="—";
   }
 }
 </script>
