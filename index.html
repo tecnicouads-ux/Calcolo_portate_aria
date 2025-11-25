@@ -16,7 +16,7 @@
       --bg-elevated: #0b1120;
       --card-soft: #111827;
       --accent: #22c55e;
-      --accent-soft: rgba(34,197,94,0.16);
+      --accent-soft: rgba(34,197,94,0.18);
       --border: #1e293b;
       --border-soft: #0f172a;
       --text-main: #f9fafb;
@@ -31,23 +31,18 @@
       --bg-elevated: #ffffff;
       --card-soft: #ffffff;
       --accent: #16a34a;
-      --accent-soft: rgba(22,163,74,0.2);
+      --accent-soft: rgba(22,163,74,0.18);
       --border: #cbd5e1;
       --border-soft: #e5e7eb;
       --text-main: #111827;
       --text-muted: #6b7280;
-      --shadow-header: rgba(148,163,184,0.3);
-      --shadow-strong: rgba(148,163,184,0.45);
-    }
 
-    * {
-      box-sizing: border-box;
-      -webkit-font-smoothing: antialiased;
+      --shadow-header: rgba(148,163,184,0.25);
+      --shadow-strong: rgba(148,163,184,0.35);
     }
 
     body {
       margin: 0;
-      min-height: 100vh;
       background: var(--bg);
       color: var(--text-main);
       font-family: var(--font-main);
@@ -55,65 +50,56 @@
       line-height: 1.35;
       display: flex;
       justify-content: center;
+      padding: 12px;
     }
 
     .app {
       width: 100%;
-      max-width: 500px;
-      padding: 14px;
+      max-width: 520px;
     }
 
-    /* HEADER */
     header {
       background: var(--bg-elevated);
       padding: 12px 14px;
       border-radius: 16px;
-      box-shadow: 0 10px 25px var(--shadow-header);
+      box-shadow: 0 12px 28px var(--shadow-header);
       border: 1px solid var(--border-soft);
       display: flex;
       align-items: center;
       gap: 10px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
     .app-icon {
       width: 34px;
       height: 34px;
-      border-radius: 10px;
       background: radial-gradient(circle at 30% 20%, #bbf7d0 0, #22c55e 50%, #15803d 100%);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
       font-weight: 800;
+      font-size: 18px;
       color: #022c22;
       flex-shrink: 0;
     }
 
-    .app-title {
-      font-size: 17px;
-      font-weight: 700;
-    }
+    .app-title { font-size: 17px; font-weight: 700; }
+    .app-subtitle { font-size: 13px; color: var(--text-muted); }
 
-    .app-subtitle {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    /* CARD */
     .card {
       background: var(--card-soft);
       padding: 14px;
       border-radius: 16px;
       border: 1px solid var(--border-soft);
-      margin-bottom: 14px;
-      box-shadow: 0 12px 28px var(--shadow-strong);
+      margin-bottom: 16px;
+      box-shadow: 0 14px 28px var(--shadow-strong);
     }
 
     .card h2 {
+      margin: 0 0 10px 0;
       font-size: 16px;
       font-weight: 700;
-      margin: 0 0 10px 0;
     }
 
     label {
@@ -121,25 +107,20 @@
       font-weight: 600;
       margin-bottom: 2px;
       display: block;
-      color: var(--text-main);
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       font-size: 15px;
       padding: 7px 10px;
-      margin: 4px 0 12px 0;
-      border: 1px solid var(--border);
       border-radius: 10px;
+      border: 1px solid var(--border);
       background: var(--bg-elevated);
       color: var(--text-main);
-      outline: none;
-      transition: 0.15s;
+      margin-bottom: 12px;
     }
 
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px var(--accent-soft);
     }
@@ -148,83 +129,56 @@
       width: 100%;
       padding: 11px;
       border-radius: 999px;
-      border: none;
       font-size: 15px;
       font-weight: 700;
       background: var(--accent);
       color: #022c22;
+      border: none;
       box-shadow: 0 8px 20px rgba(34,197,94,0.45);
-      cursor: pointer;
     }
 
-    .btn-primary:active {
-      transform: scale(0.98);
-    }
-
-    /* RISULTATI */
-    .results div {
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
+    /* RISULTATI A DUE RIGHE */
+    .twoLine {
+      padding: 8px 0;
       border-bottom: 1px solid var(--border);
-      gap: 12px;
-    }
-
-    .results div:last-child {
-      border-bottom: none;
-    }
-
-    /* FIX: valori a destra NON devono uscire */
-    .results div span:last-child {
       display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 6px;
-      max-width: 60%;
-      white-space: normal !important;
-      overflow-wrap: break-word;
-      text-align: right;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    /* TAG (sempre inline, mai su 2 righe) */
+    .twoLine .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      white-space: normal;
+    }
+
+    .twoLine .value {
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-main);
+    }
+
+    /* TAG velocità */
     .tag {
-      white-space: nowrap !important;
+      white-space: nowrap;
       padding: 2px 8px;
       font-size: 12px;
       border-radius: 999px;
       font-weight: 700;
+      margin-left: 6px;
     }
 
-    .tag-ok {
-      background: #22c55e33;
-      color: #22c55e;
-    }
-    .tag-low {
-      background: #3b82f630;
-      color: #3b82f6;
-    }
-    .tag-high {
-      background: #f9731630;
-      color: #fb923c;
-    }
-    .tag-na {
-      background: #6b728033;
-      color: #6b7280;
-    }
+    .tag-ok { background:#22c55e33; color:#22c55e; }
+    .tag-low { background:#3b82f630; color:#3b82f6; }
+    .tag-high { background:#f9731630; color:#fb923c; }
+    .tag-na { background:#6b728033; color:#6b7280; }
 
-    /* SUGGERIMENTO */
     #suggestCard {
-      background: #f9731612;
-      border: 1px solid #f97316;
-    }
-
-    #suggText {
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1.35;
-      white-space: normal !important;
+      background:#f9731615;
+      border:1px solid #f97316;
     }
   </style>
 </head>
@@ -232,32 +186,31 @@
 <body>
 <div class="app">
 
-  <!-- HEADER -->
   <header>
     <div class="app-icon">↯</div>
     <div>
       <div class="app-title">Calcolo Canale Aria</div>
-      <div class="app-subtitle">HVAC · portata · DN · UNI</div>
+      <div class="app-subtitle">HVAC · portata · velocità · DN</div>
     </div>
   </header>
 
   <!-- INPUT -->
   <div class="card">
-    <h2>Input di calcolo</h2>
+    <h2>Input</h2>
 
     <label>Portata Q (m³/h)</label>
     <input id="flow" type="number">
 
-    <label>Velocità V (m/s) (opzionale)</label>
+    <label>Velocità V (m/s) (facoltativa)</label>
     <input id="velocity" type="number">
 
-    <label>Scenario impianto</label>
+    <label>Scenario UNI</label>
     <select id="scenario">
-      <option value="res">Abitazione – mandata</option>
-      <option value="office">Uffici – mandata</option>
-      <option value="hospital">Ospedale – mandata</option>
-      <option value="extract">Estrazione / cucine</option>
-      <option value="main">Montante principale</option>
+      <option value="res">Abitazione</option>
+      <option value="office">Uffici</option>
+      <option value="hospital">Ospedale</option>
+      <option value="extract">Estrazione</option>
+      <option value="main">Montante</option>
       <option value="none">Nessun limite</option>
     </select>
 
@@ -285,58 +238,77 @@
   <!-- RISULTATI -->
   <div class="card">
     <h2>Risultati</h2>
-    <div class="results">
-      <div><span>Area A</span><span id="areaOut">—</span></div>
 
-      <div>
-        <span>Velocità considerata</span>
-        <span><span id="vEffOut">—</span><span id="vEffTag" class="tag tag-na">n/d</span></span>
-      </div>
-
-      <div id="dnBlock">
-        <div><span>Diametro equivalente</span><span id="deqOut">—</span></div>
-        <div><span>DN standard</span><span id="stdDNOut">—</span></div>
-        <div><span>Velocità con DN</span><span id="stdDNVOut">—</span></div>
-        <div id="rectSquareRow" style="display:none;">
-          <span>Lato sezione quadrata</span>
-          <span id="rectSquareOut">—</span>
-        </div>
-      </div>
-
-      <div id="circOut" style="display:none;">
-        <div><span>Lato sezione quadrata</span><span id="squareSideOut">—</span></div>
-        <div><span>DN consigliato</span><span id="circDNOut">—</span></div>
-        <div><span>Velocità DN consigliato</span><span id="circDNVOut">—</span></div>
-      </div>
+    <div class="twoLine">
+      <span class="label">Area A</span>
+      <span class="value" id="areaOut">—</span>
     </div>
+
+    <div class="twoLine">
+      <span class="label">Velocità</span>
+      <span class="value"><span id="vEffOut">—</span> <span id="vEffTag" class="tag tag-na">n/d</span></span>
+    </div>
+
+    <div id="dnBlock">
+
+      <div class="twoLine">
+        <span class="label">Diametro equivalente</span>
+        <span class="value" id="deqOut">—</span>
+      </div>
+
+      <div class="twoLine">
+        <span class="label">DN standard</span>
+        <span class="value" id="stdDNOut">—</span>
+      </div>
+
+      <div class="twoLine">
+        <span class="label">Velocità con DN</span>
+        <span class="value" id="stdDNVOut">—</span>
+      </div>
+
+      <div id="rectSquareRow" class="twoLine" style="display:none;">
+        <span class="label">Lato sezione quadrata</span>
+        <span class="value" id="rectSquareOut">—</span>
+      </div>
+
+    </div>
+
+    <div id="circOut" style="display:none;">
+
+      <div class="twoLine">
+        <span class="label">Lato sezione quadrata</span>
+        <span class="value" id="squareSideOut">—</span>
+      </div>
+
+      <div class="twoLine">
+        <span class="label">DN consigliato</span>
+        <span class="value" id="circDNOut">—</span>
+      </div>
+
+      <div class="twoLine">
+        <span class="label">Velocità DN consigliato</span>
+        <span class="value" id="circDNVOut">—</span>
+      </div>
+
+    </div>
+
   </div>
 
   <!-- SUGGERIMENTO -->
   <div class="card" id="suggestCard" style="display:none;">
     <h2>Suggerimento</h2>
-    <div class="results">
-      <div id="suggText"></div>
-    </div>
-  </div>
-
-  <!-- CONVERSIONI -->
-  <div class="card">
-    <h2>Conversioni</h2>
-    <div class="results">
-      <div><span>Q in m³/s</span><span id="qM3sOut">—</span></div>
-      <div><span>A in cm²</span><span id="areaCm2Out">—</span></div>
-      <div><span>V in km/h</span><span id="vKmhOut">—</span></div>
+    <div class="twoLine">
+      <span class="label">Indicazione UNI</span>
+      <span class="value" id="suggText">—</span>
     </div>
   </div>
 
 </div>
 
 <script>
-/* Utility */
-function byId(id) { return document.getElementById(id); }
+function byId(id){ return document.getElementById(id); }
 function round(v,d){ return Math.round(v*10**d)/10**d; }
 
-/* Scenari */
 const scenarios={
   res:{vMin:1.5,vMax:3.5},
   office:{vMin:2.0,vMax:4.0},
@@ -348,13 +320,150 @@ const scenarios={
 
 const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
 
-/* Tema giorno/notte */
+/* Tema automatico */
 (function(){
   const h=new Date().getHours();
-  const isDay=h>=7 && h<19;
-  document.documentElement.setAttribute("data-theme", isDay? "light":"dark");
+  document.documentElement.setAttribute("data-theme", (h>=7&&h<19)?"light":"dark");
 })();
 
-/* Cambio sezione */
+/* Toggle circolare/rettangolare */
 document.addEventListener("DOMContentLoaded",()=>{
-  const geomSe
+  const geomSel=byId("geom");
+  geomSel.addEventListener("change",()=>{
+    if(geomSel.value==="rect"){
+      byId("rect_fields").style.display="";
+      byId("circ_fields").style.display="none";
+      byId("dnBlock").style.display="";
+    } else {
+      byId("rect_fields").style.display="none";
+      byId("circ_fields").style.display="";
+      byId("dnBlock").style.display="none";
+    }
+    byId("circOut").style.display="none";
+  });
+});
+
+/* CALCOLO */
+function calcola(){
+  const Q=parseFloat(byId("flow").value);
+  const V_in=parseFloat(byId("velocity").value);
+  const geom=byId("geom").value;
+  const scen=scenarios[byId("scenario").value];
+
+  if(!Q||Q<=0){ alert("Inserisci Q > 0"); return; }
+
+  const Qs=Q/3600;
+  let A=null, v=null;
+
+  if(geom==="rect"){
+    const bMm=parseFloat(byId("base").value);
+    const hMm=parseFloat(byId("height").value);
+    const b=bMm?bMm/1000:null;
+    const h=hMm?hMm/1000:null;
+
+    if(V_in){
+      A=Qs/V_in;
+      v=V_in;
+      if(!b&&!h){
+        const side=Math.sqrt(A)*1000;
+        byId("rectSquareRow").style.display="";
+        byId("rectSquareOut").textContent=round(side,1)+" mm";
+      }
+    } else {
+      if(!b||!h){ alert("Serve base e altezza oppure velocità."); return; }
+      A=b*h; v=Qs/A;
+    }
+  }
+
+  if(geom==="circ"){
+    const dMm=parseFloat(byId("diam").value);
+    const hasD=dMm>0;
+
+    if(V_in){
+      A=Qs/V_in;
+      v=V_in;
+    } else {
+      if(!hasD){ alert("Serve diametro oppure velocità."); return; }
+      const d=dMm/1000;
+      A=Math.PI*d*d/4;
+      v=Qs/A;
+    }
+
+    byId("circOut").style.display="";
+    const side=Math.sqrt(A)*1000;
+    byId("squareSideOut").textContent=round(side,1)+" mm";
+
+    if(V_in && !hasD){
+      const Deq=Math.sqrt(4*A/Math.PI)*1000;
+      let best=null,min=1e9;
+      for(const dn of stdDiameters){
+        if(Math.abs(dn-Deq)<min){ min=Math.abs(dn-Deq); best=dn; }
+      }
+      byId("circDNOut").textContent="DN "+best+" mm";
+      const Astd=Math.PI*(best/1000)**2/4;
+      byId("circDNVOut").textContent=round(Qs/Astd,2)+" m/s";
+    }
+  }
+
+  if(!A||!v){ alert("Errore."); return; }
+
+  /* RISULTATI */
+  byId("areaOut").textContent=round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
+  byId("vEffOut").textContent=round(v,2)+" m/s";
+
+  const tag=(function(v,min,max){
+    if(min==null) return {text:"n/d",cls:"tag-na"};
+    if(v<min)   return {text:"Bassa",cls:"tag-low"};
+    if(v<=max)  return {text:"OK",cls:"tag-ok"};
+    return {text:"Alta",cls:"tag-high"};
+  })(v,scen.vMin,scen.vMax);
+
+  byId("vEffTag").textContent=tag.text;
+  byId("vEffTag").className="tag "+tag.cls;
+
+  /* DN per rettangolare */
+  if(geom==="rect"){
+    const Deq=Math.sqrt(4*A/Math.PI)*1000;
+    byId("deqOut").textContent=round(Deq,1)+" mm";
+
+    let best=null,min=1e9;
+    for(const dn of stdDiameters){
+      if(Math.abs(dn-Deq)<min){ min=Math.abs(dn-Deq); best=dn; }
+    }
+    if(best){
+      byId("stdDNOut").textContent="DN "+best+" mm";
+      const Astd=Math.PI*(best/1000)**2/4;
+      byId("stdDNVOut").textContent=round(Qs/Astd,2)+" m/s";
+    }
+  }
+
+  /* Suggerimento UNI */
+  if(scen.vMax!=null && v>scen.vMax){
+    const vTgt=(scen.vMin+scen.vMax)/2;
+    const Anew=Qs/vTgt;
+
+    if(geom==="rect"){
+      const side=Math.sqrt(Anew)*1000;
+      byId("suggText").textContent=
+        "Velocità alta. Sezione consigliata ~ "+round(side,1)+" × "+round(side,1)+" mm.";
+    } else {
+      const Deq=Math.sqrt(4*Anew/Math.PI)*1000;
+      let best=null,min=1e9;
+      for(const dn of stdDiameters){
+        if(Math.abs(dn-Deq)<min){ min=Math.abs(dn-Deq); best=dn; }
+      }
+      const Astd=Math.PI*(best/1000)**2/4;
+      const v2=Qs/Astd;
+      byId("suggText").textContent=
+        "Velocità alta. Consigliato DN "+best+" mm (V≈"+round(v2,2)+" m/s).";
+    }
+
+    byId("suggestCard").style.display="";
+  } else {
+    byId("suggestCard").style.display="none";
+  }
+}
+</script>
+
+</body>
+</html>
