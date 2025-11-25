@@ -120,7 +120,7 @@ header {
 }
 
 /* -------------------------------------------------------------
-   INPUT & SELECT (STESSA LARGHEZZA)
+   INPUT & SELECT (STESSA LARGHEZZA + ALTEZZA)
 ------------------------------------------------------------- */
 label {
   font-size: 14px;
@@ -139,6 +139,16 @@ input, select {
   background: var(--bg-elevated);
   color: var(--text-main);
   margin-bottom: 6px;
+
+  /* altezza uniforme tra input e select */
+  height: 48px;
+  line-height: 48px;
+}
+
+/* padding verticale leggermente ridotto per centrare testo nei select su iOS */
+select {
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
 
 input:focus, select:focus {
@@ -397,7 +407,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       byId("circ_fields").style.display="none";
       byId("dnBlock").style.display="";
     } else {
-      byId("rect_fields")..style.display="none";
+      byId("rect_fields").style.display="none";
       byId("circ_fields").style.display="";
       byId("dnBlock").style.display="none";
     }
