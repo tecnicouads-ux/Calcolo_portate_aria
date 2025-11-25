@@ -211,7 +211,8 @@
   </div>
 
 <script>
-function round(v,d){return Math.round(v*10**d)/10**d;}
+function byId(id){ return document.getElementById(id); }
+function round(v,d){ return Math.round(v*10**d)/10**d; }
 
 const scenarios={
   res:{vMin:1.5,vMax:3.5},
@@ -225,115 +226,166 @@ const scenarios={
 const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
 
 document.addEventListener("DOMContentLoaded",()=>{
-  const geomSel=document.getElementById("geom");
-  const rect=document.getElementById("rect_fields");
-  const circ=document.getElementById("circ_fields");
-  const dnBlock=document.getElementById("dnBlock");
+  const geomSel=byId("geom");
+  const rectFields=byId("rect_fields");
+  const circFields=byId("circ_fields");
+  const scenSel=byId("scenario");
+  const scenInfo=byId("scenarioInfo");
+
+  function updateScenarioInfo(){
+    const s=scenarios[scenSel.value];
+    if(s.vMin!=null){
+      scenInfo.textContent="Range consigliato: "+s.vMin+" – "+s.vMax+" m/s";
+    }else{
+      scenInfo.textContent="Nessun limite impostato";
+    }
+  }
+  scenSel.addEventListener("change",updateScenarioInfo);
+  updateScenarioInfo();
 
   geomSel.addEventListener("change",()=>{
     if(geomSel.value==="rect"){
-      rect.style.display="";
-      circ.style.display="none";
-      dnBlock.style.display="";
-      document.getElementById("circOut").style.display="none";
+      rectFields.style.display="";
+      circFields.style.display="none";
+      byId("dnBlock").style.display="";
     }else{
-      rect.style.display="none";
-      circ.style.display="";
-      dnBlock.style.display="none";
+      rectFields.style.display="none";
+      circFields.style.display="";
+      byId("dnBlock").style.display="none";
     }
+    byId("circOut").style.display="none";
   });
 });
 
-function getTag(v,min,max){
-  if(min==null)return{text:"n/d",cls:"tag-na"};
-  if(v<min)return{text:"Bassa",cls:"tag-low"};
-  if(v<=max)return{text:"OK",cls:"tag-ok"};
-  return{text:"Alta",cls:"tag-high"};
+function getVelocityTag(v,min,max){
+  if(!v || min==null) return {text:"n/d",cls:"tag-na"};
+  if(v<min) return {text:"Bassa",cls:"tag-low"};
+  if(v<=max) return {text:"OK",cls:"tag-ok"};
+  return {text:"Alta",cls:"tag-high"};
 }
 
 function calcola(){
-  const Q=parseFloat(flow.value);
-  const V=parseFloat(velocity.value);
-  const geom=geomSel.value;
+  const Q=parseFloat(byId("flow").value);
+  const V_input=parseFloat(byId("velocity").value);
+  const geom=byId("geom").value;
+  const scenKey=byId("scenario").value;
+  const scen=scenarios[scenKey];
 
-  const dnBlock=document.getElementById("dnBlock");
-  const circOut=document.getElementById("circOut");
+  const dnBlock=byId("dnBlock");
+  const circOut=byId("circOut");
+  const vEffTagEl=byId("vEffTag");
 
   circOut.style.display="none";
-  dnBlock.style.display=(geom==="rect")?"":"none";
+  vEffTagEl.textContent="n/d";
+  vEffTagEl.className="tag tag-na";
 
-  if(!Q){alert("Portata mancante");return;}
+  if(!Q || Q<=0){
+    alert("Inserisci portata Q > 0");
+    return;
+  }
 
-  let A,vEff;
+  let A=null;
+  let vEff=null;
   const Qs=Q/3600;
 
   if(geom==="rect"){
-    const b=parseFloat(base.value)/1000||null;
-    const h=parseFloat(height.value)/1000||null;
+    dnBlock.style.display="";
+    const baseMm=parseFloat(byId("base").value);
+    const heightMm=parseFloat(byId("height").value);
+    const b=baseMm? baseMm/1000 : null;
+    const h=heightMm? heightMm/1000 : null;
 
-    if(V){
-      A=Qs/V;
-      vEff=V;
+    if(V_input && V_input>0){
+      A=Qs/V_input;
+      vEff=V_input;
+      // se base/altezza mancanti, dimensiono solo per area
+      if(!b || !h){
+        // ok, nessun vincolo geometrico richiesto in output
+      }
     }else{
-      if(!b||!h){alert("Base e altezza obbligatorie");return;}
+      if(!b || !h){
+        alert("Se la velocità non è nota, per rettangolare servono base e altezza.");
+        return;
+      }
       A=b*h;
       vEff=Qs/A;
     }
   }
 
   if(geom==="circ"){
-    const dMm=parseFloat(diam.value);
-    if(!dMm){alert("Diametro obbligatorio");return;}
-    const d=dMm/1000;
+    dnBlock.style.display="none";
+    const dMm=parseFloat(byId("diam").value);
+    const hasD = dMm && dMm>0;
+    let d=null;
 
-    if(V){
-      A=Qs/V;
-      vEff=V;
+    if(V_input && V_input>0){
+      A=Qs/V_input;
+      vEff=V_input;
+      // il diametro è opzionale in questo caso
     }else{
-      A=Math.PI*(d**2)/4;
+      if(!hasD){
+        alert("Se la velocità non è nota, per circolare serve il diametro.");
+        return;
+      }
+      d=dMm/1000;
+      A=Math.PI*d*d/4;
       vEff=Qs/A;
     }
 
+    // mostra solo il lato equivalente
     circOut.style.display="";
-    const side=Math.sqrt(A)*1000;
-    squareSideOut.textContent=round(side,1)+" mm";
+    const side_m=Math.sqrt(A);
+    const side_mm=side_m*1000;
+    byId("squareSideOut").textContent=round(side_mm,1)+" mm";
   }
 
-  if(!A){alert("Errore calcolo A");return;}
+  if(!A || !vEff || A<=0 || vEff<=0){
+    alert("Errore nel calcolo. Controlla i dati.");
+    return;
+  }
 
-  // Area
-  areaOut.textContent=round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
+  // Area in m² e mm²
+  const A_mm2=A*1_000_000;
+  byId("areaOut").textContent=round(A,4)+" m² ("+round(A_mm2,0)+" mm²)";
 
-  // Velocità
-  vEffOut.textContent=round(vEff,2)+" m/s";
-  const sc=scenarios[scenario.value];
-  const tag=getTag(vEff,sc.vMin,sc.vMax);
-  vEffTag.textContent=tag.text;
-  vEffTag.className="tag "+tag.cls;
+  // Velocità + tag
+  byId("vEffOut").textContent=round(vEff,2)+" m/s";
+  const tag=getVelocityTag(vEff,scen.vMin,scen.vMax);
+  vEffTagEl.textContent=tag.text;
+  vEffTagEl.className="tag "+tag.cls;
 
   // Conversioni
-  qM3sOut.textContent=round(Qs,4);
-  areaCm2Out.textContent=round(A*10000,1);
-  vKmhOut.textContent=round(vEff*3.6,2);
+  byId("qM3sOut").textContent=round(Qs,4);
+  byId("areaCm2Out").textContent=round(A*10000,1);
+  byId("vKmhOut").textContent=round(vEff*3.6,2);
 
-  // DN / Deq SOLO se rettangolare
+  // DN / Deq solo per rettangolare
   if(geom==="rect"){
-    const Deq=Math.sqrt(4*A/Math.PI)*1000;
-    deqOut.textContent=round(Deq,1)+" mm";
+    const Deq_mm=Math.sqrt(4*A/Math.PI)*1000;
+    byId("deqOut").textContent=round(Deq_mm,1)+" mm";
 
-    let best=null,min=1e9;
+    let best=null,minDiff=1e9;
     for(const dn of stdDiameters){
-      let diff=Math.abs(dn-Deq);
-      if(diff<min){min=diff;best=dn;}
+      const diff=Math.abs(dn-Deq_mm);
+      if(diff<minDiff){
+        minDiff=diff;
+        best=dn;
+      }
     }
 
-    stdDNOut.textContent="DN "+best;
-    const Astd=Math.PI*(best/1000)**2/4;
-    stdDNVOut.textContent=round(Qs/Astd,2)+" m/s";
+    if(best){
+      byId("stdDNOut").textContent="DN "+best+" mm";
+      const Astd=Math.PI*(best/1000)**2/4;
+      const Vstd=Qs/Astd;
+      byId("stdDNVOut").textContent=round(Vstd,2)+" m/s";
+    }else{
+      byId("stdDNOut").textContent="—";
+      byId("stdDNVOut").textContent="—";
+    }
   }else{
-    deqOut.textContent="—";
-    stdDNOut.textContent="—";
-    stdDNVOut.textContent="—";
+    byId("deqOut").textContent="—";
+    byId("stdDNOut").textContent="—";
+    byId("stdDNVOut").textContent="—";
   }
 }
 </script>
