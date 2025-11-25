@@ -311,17 +311,12 @@ input:focus, select:focus {
   <div id="dnBlock">
 
     <div class="twoLine">
-      <span class="label">Diametro equivalente</span>
-      <span class="value" id="deqOut">—</span>
-    </div>
-
-    <div class="twoLine">
-      <span class="label">DN standard</span>
+      <span class="label">Diametro equivalente (Ø)</span>
       <span class="value" id="stdDNOut">—</span>
     </div>
 
     <div class="twoLine">
-      <span class="label">Velocità con DN</span>
+      <span class="label">Velocità con Ø equivalente</span>
       <span class="value" id="stdDNVOut">—</span>
     </div>
 
@@ -532,11 +527,9 @@ function calcola(){
   byId("vEffTag").textContent = tag.text;
   byId("vEffTag").className = "tag "+tag.cls;
 
-  /* DN RETTANGOLARE */
+  /* DIAMETRO EQUIVALENTE (RETTANGOLARE) */
   if(geom==="rect"){
     const Deq = Math.sqrt(4*A/Math.PI)*1000;
-    byId("deqOut").textContent = round(Deq,1)+" mm";
-
     let best=null,min=1e9;
     for(const dn of stdDiameters){
       if(Math.abs(dn-Deq)<min){
@@ -546,16 +539,15 @@ function calcola(){
     }
 
     if(best){
-      byId("stdDNOut").textContent="DN "+best+" mm";
+      byId("stdDNOut").textContent = "Ø "+best+" mm";
       const Astd=Math.PI*(best/1000)**2/4;
-      byId("stdDNVOut").textContent=round(Qs/Astd,2)+" m/s";
+      byId("stdDNVOut").textContent = round(Qs/Astd,2)+" m/s";
     } else {
       byId("stdDNOut").textContent="—";
       byId("stdDNVOut").textContent="—";
     }
   }
   else {
-    byId("deqOut").textContent="—";
     byId("stdDNOut").textContent="—";
     byId("stdDNVOut").textContent="—";
   }
