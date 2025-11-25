@@ -63,61 +63,42 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER WRAPPER + BANNER TESTO + LOGO "CHE ESCE"
+   HEADER COMPATTO + LOGO 80PX (STILE A)
 ------------------------------------------------------------- */
-.header-link {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-}
-
-.header-wrapper {
-  position: relative;
-  margin-bottom: 42px; /* spazio per il logo che esce sotto */
-}
-
-.header-card {
+header {
   background: var(--bg-elevated);
-  padding: 6px 10px;
+  padding: 4px 8px;
   border-radius: 12px;
   box-shadow: 0 6px 14px var(--shadow-header);
   border: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
-  min-height: 40px; /* banner basso */
+  gap: 8px;
+  margin-bottom: 12px;
+  min-height: 60px;
 }
 
-.header-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.app-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 10px;
+  flex-shrink: 0;
+  margin: 0;
 }
 
 .app-title {
   font-size: 17px;
   font-weight: 700;
-  line-height: 1.1;
-  margin: 0 0 3px 0;
+  line-height: 1.0;
+  margin-bottom: 3px;
 }
 
 .app-subtitle {
   font-size: 11px;
   color: var(--text-muted);
-  line-height: 1.1;
-  margin: 0;
-}
-
-/* Logo flottante che "esce" dal banner */
-.app-logo-floating {
-  position: absolute;
-  left: 10px;
-  bottom: -26px;        /* quanto esce sotto il banner */
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  border-radius: 12px;
-  box-shadow: 0 10px 18px rgba(0,0,0,0.65);
-  background: var(--bg-elevated);
+  margin-top: 0;
+  line-height: 1.0;
 }
 
 /* -------------------------------------------------------------
@@ -248,17 +229,15 @@ input:focus, select:focus {
 <body>
 <div class="app">
 
-<!-- HEADER BANNER + LOGO FLOTTANTE -->
-<a href="https://www.airdistributionsystems.it/home.php" target="_blank" class="header-link">
-  <div class="header-wrapper">
-    <div class="header-card">
-      <div class="header-text">
-        <div class="app-title">Calcolo Portate Aria</div>
-        <div class="app-subtitle">Air Distribution Systems</div>
-      </div>
-    </div>
-    <img src="logo.png" alt="Logo" class="app-logo-floating">
+<!-- HEADER CON LINK AL SITO ADS -->
+<a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
+<header>
+  <img src="logo.png" alt="Logo" class="app-logo">
+  <div style="display:flex; flex-direction:column; justify-content:center;">
+    <div class="app-title">Calcolo Portate Aria</div>
+    <div class="app-subtitle">Air Distribution Systems</div>
   </div>
+</header>
 </a>
 
 <!-- ===================== INPUT ===================== -->
@@ -271,17 +250,17 @@ input:focus, select:focus {
   <label>Velocità V (m/s) (opzionale)</label>
   <input id="velocity" type="number" inputmode="decimal">
 
-  <label>Scenario UNI</label>
+  <label>Tipo ambiente (UNI 10339 / UNI EN 16798)</label>
   <select id="scenario">
-    <option value="res">Abitazione</option>
-    <option value="office">Uffici</option>
-    <option value="hospital">Ospedale</option>
-    <option value="extract">Estrazione</option>
-    <option value="main">Montante</option>
-    <option value="none">Nessun limite</option>
+    <option value="res">Residenziale (UNI 10339)</option>
+    <option value="office">Uffici / Terziario (UNI EN 16798)</option>
+    <option value="hospital">Area sanitaria (UNI 10339)</option>
+    <option value="extract">Estrazione aria (cucine, servizi)</option>
+    <option value="main">Montante principale</option>
+    <option value="none">Nessuna limitazione</option>
   </select>
 
-  <label>Tipo sezione</label>
+  <label>Forma canale</label>
   <select id="geom">
     <option value="rect">Rettangolare</option>
     <option value="circ">Circolare</option>
@@ -381,13 +360,24 @@ input:focus, select:focus {
 function byId(i){return document.getElementById(i);}
 function round(v,d){return Math.round(v*10**d)/10**d;}
 
+/*
+  Limiti velocità canali secondo prassi progettuale
+  in accordo a UNI 10339 / UNI EN 16798 (valori tipici):
+
+  - Residenziale (rami):        1.5–3.0 m/s
+  - Uffici / Terziario:         2.5–4.5 m/s
+  - Area sanitaria:             1.5–2.5 m/s
+  - Estrazione cucine/servizi:  5.0–7.0 m/s
+  - Montanti principali:        4.0–6.5 m/s
+*/
+
 const scenarios={
-  res:{vMin:1.5,vMax:3.5},
-  office:{vMin:2.0,vMax:4.0},
-  hospital:{vMin:1.5,vMax:3.0},
-  extract:{vMin:5.0,vMax:8.0},
-  main:{vMin:6.0,vMax:9.0},
-  none:{vMin:null,vMax:null}
+  res:{      vMin:1.5, vMax:3.0},
+  office:{   vMin:2.5, vMax:4.5},
+  hospital:{ vMin:1.5, vMax:2.5},
+  extract:{  vMin:5.0, vMax:7.0},
+  main:{     vMin:4.0, vMax:6.5},
+  none:{     vMin:null, vMax:null}
 };
 
 const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
@@ -407,7 +397,7 @@ document.addEventListener("DOMContentLoaded",()=>{
       byId("circ_fields").style.display="none";
       byId("dnBlock").style.display="";
     } else {
-      byId("rect_fields").style.display="none";
+      byId("rect_fields")..style.display="none";
       byId("circ_fields").style.display="";
       byId("dnBlock").style.display="none";
     }
