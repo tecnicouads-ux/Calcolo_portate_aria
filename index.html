@@ -146,6 +146,8 @@ input, select {
 
 .info-note-row {
   font-size: 12px;
+  white-space: normal !important;
+  display: block;
 }
 
 /* -------------------------------------------------------------
@@ -251,9 +253,7 @@ input, select {
   </select>
 
   <div id="scenarioNote" class="info-note">
-    <span class="info-note-title">Abitazioni</span>
-    <div class="info-note-row">Velocità consigliata: 1,5 – 3,5 m/s.</div>
-    <div class="info-note-row">UNI 10339 / UNI EN 15251</div>
+    <span class="info-note-row">Abitazioni – 1.5–3.5 m/s – UNI 10339 / UNI EN 15251</span>
   </div>
 
   <label>Geometria del condotto</label>
@@ -297,7 +297,6 @@ input, select {
 
   <div id="dnBlock">
 
-    <!-- Ø standard -->
     <div class="twoLine">
       <span class="label">Ø standard</span>
       <span class="value" id="stdDNOut">—</span>
@@ -357,39 +356,29 @@ const scenarios={
 
 const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
 
+/* ===================== NUOVA VERSIONE ===================== */
 function updateScenarioNote(){
   const s = byId("scenario").value;
   const note = byId("scenarioNote");
 
   const notes = {
     res:
-      '<span class="info-note-title">Abitazioni</span>'+
-      '<div class="info-note-row">1,5 – 3,5 m/s</div>'+
-      '<div class="info-note-row">UNI 10339 / UNI EN 15251</div>',
+      '<span class="info-note-row">Abitazioni – 1.5–3.5 m/s – UNI 10339 / UNI EN 15251</span>',
 
     office:
-      '<span class="info-note-title">Uffici</span>'+
-      '<div class="info-note-row">2 – 4 m/s</div>'+
-      '<div class="info-note-row">UNI 10339 / UNI EN 13779</div>',
+      '<span class="info-note-row">Uffici – 2–4 m/s – UNI 10339 / UNI EN 13779</span>',
 
     hospital:
-      '<span class="info-note-title">Ospedali</span>'+
-      '<div class="info-note-row">1,5 – 3 m/s</div>'+
-      '<div class="info-note-row">UNI 11425 / UNI EN 13779</div>',
+      '<span class="info-note-row">Ospedali – 1.5–3 m/s – UNI 11425 / UNI EN 13779</span>',
 
     extract:
-      '<span class="info-note-title">Estrazione</span>'+
-      '<div class="info-note-row">5 – 8 m/s</div>'+
-      '<div class="info-note-row">UNI 10339 / UNI EN 13779</div>',
+      '<span class="info-note-row">Estrazione – 5–8 m/s – UNI 10339 / UNI EN 13779</span>',
 
     main:
-      '<span class="info-note-title">Montanti</span>'+
-      '<div class="info-note-row">6 – 9 m/s</div>'+
-      '<div class="info-note-row">UNI 10339 / UNI EN 13779</div>',
+      '<span class="info-note-row">Montanti – 6–9 m/s – UNI 10339 / UNI EN 13779</span>',
 
     none:
-      '<span class="info-note-title">Nessun limite</span>'+
-      '<div class="info-note-row">Verifica disattivata</div>'
+      '<span class="info-note-row">Nessun limite – verifica disattivata</span>'
   };
 
   note.innerHTML = notes[s];
