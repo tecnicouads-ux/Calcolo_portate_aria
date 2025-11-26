@@ -316,16 +316,6 @@ input, select {
       <span class="label">Lato sezione quadrata</span>
       <span class="value" id="squareSideOut">—</span>
     </div>
-
-    <div class="twoLine">
-      <span class="label">DN consigliato</span>
-      <span class="value" id="circDNOut">—</span>
-    </div>
-
-    <div class="twoLine">
-      <span class="label">Velocità DN consigliato</span>
-      <span class="value" id="circDNVOut">—</span>
-    </div>
   </div>
 </div>
 
@@ -571,30 +561,6 @@ function calcola(){
     byId("stdDNVOut").textContent = "—";
   }
 
-  /* DN consigliato per circolare (solo se V inserita e diametro NON inserito) */
-  if(geom==="circ"){
-    const dMm = parseFloat(byId("diam").value);
-    const d = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
-    if(V_in && !d){
-      const Deq = Math.sqrt(4*A/Math.PI)*1000;
-      let best = null, m = 1e9;
-      for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}
-      }
-      if(best){
-        byId("circDNOut").textContent = "DN "+best+" mm";
-        byId("circDNVOut").textContent =
-          round(Qs/(Math.PI*(best/1000)**2/4),2)+" m/s";
-      } else {
-        byId("circDNOut").textContent  = "—";
-        byId("circDNVOut").textContent = "—";
-      }
-    } else {
-      byId("circDNOut").textContent  = byId("circDNOut").textContent || "—";
-      byId("circDNVOut").textContent = byId("circDNVOut").textContent || "—";
-    }
-  }
-
   /* SUGGERIMENTO */
   if(scen.vMax!=null && v>scen.vMax){
     const vT = (scen.vMin+scen.vMax)/2;
@@ -628,4 +594,4 @@ function calcola(){
 </script>
 
 </body>
-</html>
+<
