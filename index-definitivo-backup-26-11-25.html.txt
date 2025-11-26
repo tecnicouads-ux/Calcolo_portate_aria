@@ -32,7 +32,7 @@
 }
 
 /* -------------------------------------------------------------
-   STRUTTURA (SAFE AREA NOTCH)
+   STRUTTURA
 ------------------------------------------------------------- */
 body {
   margin: 0;
@@ -47,10 +47,7 @@ body {
   padding-top: env(safe-area-inset-top);
 }
 
-.app {
-  width: 100%;
-  max-width: 520px;
-}
+.app { width: 100%; max-width: 520px; }
 
 /* -------------------------------------------------------------
    HEADER
@@ -69,23 +66,14 @@ header {
 }
 
 .app-logo {
-  width: 80px;
-  height: 80px;
+  width: 80px; height: 80px;
   object-fit: contain;
   border-radius: 12px;
   flex-shrink: 0;
 }
 
-.app-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.app-subtitle {
-  font-size: 12px;
-  color: var(--text-muted);
-}
+.app-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+.app-subtitle { font-size: 12px; color: var(--text-muted); }
 
 /* -------------------------------------------------------------
    CARD
@@ -98,15 +86,10 @@ header {
   border: 1px solid var(--border-soft);
   box-shadow: 0 10px 24px var(--shadow-strong);
 }
-
-.card h2 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-  font-weight: 700;
-}
+.card h2 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
 
 /* -------------------------------------------------------------
-   INPUT & SELECT
+   INPUT
 ------------------------------------------------------------- */
 label {
   font-size: 14px;
@@ -114,7 +97,6 @@ label {
   margin-bottom: 2px;
   display: block;
 }
-
 input, select {
   width: 100%;
   font-size: 15px;
@@ -128,9 +110,7 @@ input, select {
   box-sizing: border-box;
 }
 
-/* -------------------------------------------------------------
-   NOTE
-------------------------------------------------------------- */
+/* Note */
 .info-note {
   font-size: 12px;
   color: var(--text-muted);
@@ -141,16 +121,9 @@ input, select {
   border-radius: 8px;
   background: rgba(148,163,184,0.10);
 }
+.info-note-row { font-size: 12px; display: block; }
 
-.info-note-row {
-  font-size: 12px;
-  white-space: normal !important;
-  display: block;
-}
-
-/* -------------------------------------------------------------
-   BOTTONI
-------------------------------------------------------------- */
+/* Buttons */
 .btn-primary {
   width: 100%;
   padding: 11px;
@@ -163,9 +136,7 @@ input, select {
   box-shadow: 0 8px 20px rgba(22,163,74,0.45);
 }
 
-/* -------------------------------------------------------------
-   RISULTATI
-------------------------------------------------------------- */
+/* Results */
 .twoLine {
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
@@ -173,20 +144,10 @@ input, select {
   flex-direction: column;
   gap: 3px;
 }
+.twoLine .label { font-size: 13px; color: var(--text-muted); }
+.twoLine .value { font-size: 15px; font-weight: 700; white-space: nowrap; }
 
-.twoLine .label {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.twoLine .value {
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-/* TAG */
+/* Tags */
 .tag {
   white-space: nowrap;
   padding: 2px 8px;
@@ -195,14 +156,12 @@ input, select {
   font-weight: 700;
   margin-left: 6px;
 }
-.tag-ok  { background:#16a34a33; color:#16a34a; }
-.tag-low { background:#2563eb30; color:#2563eb; }
+.tag-ok { background:#16a34a33; color:#16a34a; }
+.tag-low{ background:#2563eb30; color:#2563eb; }
 .tag-high{ background:#f9731630; color:#f97316; }
-.tag-na  { background:#6b728033; color:#6b7280; }
+.tag-na { background:#6b728033; color:#6b7280; }
 
-/* -------------------------------------------------------------
-   SUGGERIMENTO
-------------------------------------------------------------- */
+/* Suggestion */
 #suggestCard {
   background:#f9731615;
   border:1px solid #f97316;
@@ -230,7 +189,7 @@ input, select {
 </header>
 </a>
 
-<!-- ===================== INPUT ===================== -->
+<!-- INPUT -->
 <div class="card">
   <h2>Input</h2>
 
@@ -276,7 +235,7 @@ input, select {
   <button class="btn-primary" onclick="calcola()">Calcola</button>
 </div>
 
-<!-- ===================== RISULTATI ===================== -->
+<!-- RISULTATI -->
 <div class="card" id="resultsCard">
   <h2>Risultati</h2>
 
@@ -294,7 +253,6 @@ input, select {
   </div>
 
   <div id="dnBlock">
-
     <div class="twoLine">
       <span class="label">Ø standard</span>
       <span class="value" id="stdDNOut">—</span>
@@ -319,16 +277,16 @@ input, select {
   </div>
 </div>
 
-<!-- ===================== SUGGERIMENTO ===================== -->
+<!-- SUGGERIMENTO -->
 <div class="card" id="suggestCard" style="display:none;">
   <h2>Suggerimento</h2>
   <div class="twoLine">
-    <span class="label">Consiglio UNI</span>
+    <span class="label">Consiglio normativa UNI</span>
     <span class="value" id="suggText">—</span>
   </div>
 </div>
 
-<!-- ===================== SCRIPT ===================== -->
+<!-- SCRIPT -->
 <script>
 function byId(i){return document.getElementById(i);}
 function round(v,d){return Math.round(v*10**d)/10**d;}
@@ -344,27 +302,17 @@ const scenarios={
 
 const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
 
-/* NOTE UNI UNA RIGA */
 function updateScenarioNote(){
   const s = byId("scenario").value;
-  const note = byId("scenarioNote");
-
   const notes = {
-    res:
-      '<span class="info-note-row">Abitazioni – 1.5–3.5 m/s – UNI 10339 / UNI EN 15251</span>',
-    office:
-      '<span class="info-note-row">Uffici – 2–4 m/s – UNI 10339 / UNI EN 13779</span>',
-    hospital:
-      '<span class="info-note-row">Ospedali – 1.5–3 m/s – UNI 11425 / UNI EN 13779</span>',
-    extract:
-      '<span class="info-note-row">Estrazione – 5–8 m/s – UNI 10339 / UNI EN 13779</span>',
-    main:
-      '<span class="info-note-row">Montanti – 6–9 m/s – UNI 10339 / UNI EN 13779</span>',
-    none:
-      '<span class="info-note-row">Nessun limite – verifica disattivata</span>'
+    res:'<span class="info-note-row">Abitazioni – 1.5–3.5 m/s – UNI 10339 / UNI EN 15251</span>',
+    office:'<span class="info-note-row">Uffici – 2–4 m/s – UNI 10339 / UNI EN 13779</span>',
+    hospital:'<span class="info-note-row">Ospedali – 1.5–3 m/s – UNI 11425 / UNI EN 13779</span>',
+    extract:'<span class="info-note-row">Estrazione – 5–8 m/s – UNI 10339 / UNI EN 13779</span>',
+    main:'<span class="info-note-row">Montanti – 6–9 m/s – UNI 10339 / UNI EN 13779</span>',
+    none:'<span class="info-note-row">Nessun limite – verifica disattivata</span>'
   };
-
-  note.innerHTML = notes[s];
+  byId("scenarioNote").innerHTML = notes[s];
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
@@ -406,16 +354,14 @@ function calcola(){
   const geom = byId("geom").value;
   const scen = scenarios[byId("scenario").value];
 
-  // Serve almeno portata o velocità
   if(!Q && !V_in){
     alert("Inserisci almeno Portata Q oppure Velocità V > 0");
     return;
   }
 
-  let A = null;   // area [m²]
-  let v = null;   // velocità effettiva [m/s]
+  let A = null;
+  let v = null;
 
-  // reset viste
   byId("circOut").style.display="none";
   byId("rectSquareRow").style.display="none";
   byId("suggestCard").style.display="none";
@@ -427,11 +373,10 @@ function calcola(){
     let b = (!isNaN(bMm) && bMm>0) ? bMm/1000 : null;
     let h = (!isNaN(hMm) && hMm>0) ? hMm/1000 : null;
 
-    if(Q){ // PORTATA NOTA
+    if(Q){
       const Qs_tmp = Q/3600;
 
       if(V_in){
-        // Caso "classico" originale: da Q e V ricavo A
         A = Qs_tmp / V_in;
         v = V_in;
 
@@ -446,13 +391,11 @@ function calcola(){
           byId("rectSquareRow").style.display="";
           byId("rectSquareOut").textContent = round(side,1)+" mm";
         } else {
-          // Tutte e due inserite → ricalcolo v dalla sezione reale
           A = b*h;
           v = Qs_tmp / A;
         }
 
       } else {
-        // Niente velocità → servono base e altezza
         if(!b || !h){
           alert("Se la velocità non è nota, inserisci base e altezza.");
           return;
@@ -462,7 +405,6 @@ function calcola(){
       }
 
     } else {
-      // PORTATA NON NOTA → uso V_in + dimensioni per ricavare Q
       if(!V_in){
         alert("Se la portata non è nota, inserisci una velocità V > 0.");
         return;
@@ -478,17 +420,47 @@ function calcola(){
 
   /* ===================== CIRCOLARE ===================== */
   if(geom==="circ"){
-    const dMm = parseFloat(byId("diam").value);
-    const d = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
+    let dMm = parseFloat(byId("diam").value);
+    let d   = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
 
-    if(Q){ // PORTATA NOTA
+    if(Q){
       const Qs_tmp = Q/3600;
 
       if(V_in){
-        // Da Q e V ricavo area equivalente
-        A = Qs_tmp / V_in;
-        v = V_in;
+        // Caso Q e V note:
+        // se il diametro NON è inserito, calcolo DN standard più vicino
+        if(!d){
+          const Aideal = Qs_tmp / V_in; // area ideale
+          const Deq = Math.sqrt(4*Aideal/Math.PI)*1000; // diametro ideale [mm]
+
+          let best = null, m = 1e9;
+          for(const dn of stdDiameters){
+            const diff = Math.abs(dn - Deq);
+            if(diff < m){
+              m = diff;
+              best = dn;
+            }
+          }
+
+          if(best){
+            byId("diam").value = best;
+            dMm = best;
+            d   = best/1000;
+          }
+        }
+
+        if(!d){
+          // fallback improbabile: uso comunque A da Q e V
+          A = Qs_tmp / V_in;
+          v = V_in;
+        } else {
+          // uso DN (inserito o appena scelto) e ricalcolo v reale
+          A = Math.PI*d*d/4;
+          v = Qs_tmp / A;
+        }
+
       } else {
+        // Nessuna velocità: uso Q + diametro
         if(!d){
           alert("Se la velocità non è nota, inserisci diametro.");
           return;
@@ -511,7 +483,6 @@ function calcola(){
       v = V_in;
     }
 
-    // Blocco risultati specifico per circolare
     byId("circOut").style.display="";
     byId("squareSideOut").textContent = round(Math.sqrt(A)*1000,1)+" mm";
   }
@@ -521,17 +492,15 @@ function calcola(){
     return;
   }
 
-  // Ora, se Q era sconosciuta, la ricavo da A e v
   let Qs;
   if(Q && Q>0){
     Qs = Q/3600;
   } else {
     Qs = v*A;
     Q  = Qs*3600;
-    byId("flow").value = Math.round(Q); // aggiorno campo portata
+    byId("flow").value = Math.round(Q);
   }
 
-  /* ===================== RISULTATI GENERALI ===================== */
   byId("areaOut").textContent =
     round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
   byId("vEffOut").textContent = round(v,2)+" m/s";
@@ -540,7 +509,6 @@ function calcola(){
   byId("vEffTag").textContent = tag.text;
   byId("vEffTag").className = "tag "+tag.cls;
 
-  /* Ø STANDARD rettangolare */
   if(geom==="rect"){
     const Deq = Math.sqrt(4*A/Math.PI)*1000;
     let best = null, m = 1e9;
@@ -553,12 +521,12 @@ function calcola(){
       byId("stdDNVOut").textContent =
         round(Qs/(Math.PI*(best/1000)**2/4),2)+" m/s";
     } else {
-      byId("stdDNOut").textContent  = "—";
-      byId("stdDNVOut").textContent = "—";
+      byId("stdDNOut").textContent="—";
+      byId("stdDNVOut").textContent="—";
     }
   } else {
-    byId("stdDNOut").textContent  = "—";
-    byId("stdDNVOut").textContent = "—";
+    byId("stdDNOut").textContent="—";
+    byId("stdDNVOut").textContent="—";
   }
 
   /* SUGGERIMENTO */
@@ -566,27 +534,26 @@ function calcola(){
     const vT = (scen.vMin+scen.vMax)/2;
     const Anew = Qs/vT;
 
-    if(geom==="rect"){
-      const side = Math.sqrt(Anew)*1000;
-      byId("suggText").textContent =
-        "Velocità alta → sezione consigliata: "+
-        round(side,1)+" × "+round(side,1)+" mm.";
-    } else {
-      const Deq = Math.sqrt(4*Anew/Math.PI)*1000;
-      let best = null, m = 1e9;
-      for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}
+    const L = Math.sqrt(Anew)*1000;  // lato quadrato in mm
+
+    let best = null, m = 1e9;
+    const DeqNew = Math.sqrt(4*Anew/Math.PI)*1000;
+    for(const dn of stdDiameters){
+      const diff = Math.abs(dn - DeqNew);
+      if(diff < m){
+        m = diff;
+        best = dn;
       }
-      const v2 = Qs/(Math.PI*(best/1000)**2/4);
-      byId("suggText").textContent =
-        "Velocità alta → DN consigliato "+best+
-        " mm (V≈"+round(v2,2)+" m/s).";
     }
+
+    byId("suggText").textContent =
+      "Velocità alta → sezione consigliata: "+
+      round(L,1)+" × "+round(L,1)+
+      " mm oppure Ø "+best+" mm.";
 
     byId("suggestCard").style.display="";
   }
 
-  /* SCROLL AUTOMATICO */
   setTimeout(()=>{
     byId("resultsCard").scrollIntoView({behavior:"smooth",block:"start"});
   },120);
@@ -595,3 +562,4 @@ function calcola(){
 
 </body>
 </html>
+
