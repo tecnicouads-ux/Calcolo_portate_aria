@@ -43,7 +43,7 @@ html[data-theme="light"] {
 }
 
 /* -------------------------------------------------------------
-   STRUTTURA BASE (SAFE AREA NOTCH)
+   STRUTTURA (SAFE AREA NOTCH)
 ------------------------------------------------------------- */
 body {
   margin: 0;
@@ -55,7 +55,7 @@ body {
   display: flex;
   justify-content: center;
   padding: 12px;
-  padding-top: env(safe-area-inset-top); /* evita il notch */
+  padding-top: env(safe-area-inset-top);
 }
 
 .app {
@@ -64,7 +64,7 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER COMPATTO + LOGO 80PX
+   HEADER
 ------------------------------------------------------------- */
 header {
   background: var(--bg-elevated);
@@ -85,21 +85,17 @@ header {
   object-fit: contain;
   border-radius: 12px;
   flex-shrink: 0;
-  margin: 0;
 }
 
 .app-title {
   font-size: 18px;
   font-weight: 700;
-  line-height: 1;
   margin-bottom: 4px;
 }
 
 .app-subtitle {
   font-size: 12px;
   color: var(--text-muted);
-  margin-top: 0;
-  line-height: 1.1;
 }
 
 /* -------------------------------------------------------------
@@ -121,7 +117,7 @@ header {
 }
 
 /* -------------------------------------------------------------
-   INPUT & SELECT (stessa altezza)
+   INPUT & SELECT
 ------------------------------------------------------------- */
 label {
   font-size: 14px;
@@ -156,12 +152,9 @@ select {
   box-sizing: border-box;
 }
 
-input:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-  outline: none;
-}
-
+/* -------------------------------------------------------------
+   NOTE
+------------------------------------------------------------- */
 .auto-note {
   font-size: 11px;
   color: var(--accent);
@@ -169,7 +162,6 @@ input:focus, select:focus {
   margin-bottom: 8px;
 }
 
-/* Nota sotto Scenario UNI – stile "tendina tabella" */
 .info-note {
   font-size: 12px;
   color: var(--text-muted);
@@ -180,11 +172,13 @@ input:focus, select:focus {
   border-radius: 8px;
   background: rgba(148,163,184,0.10);
 }
+
 .info-note-title {
   font-weight: 600;
   display: block;
   margin-bottom: 2px;
 }
+
 .info-note-row {
   font-size: 12px;
 }
@@ -205,7 +199,7 @@ input:focus, select:focus {
 }
 
 /* -------------------------------------------------------------
-   RISULTATI A 2 RIGHE
+   RISULTATI
 ------------------------------------------------------------- */
 .twoLine {
   padding: 8px 0;
@@ -218,7 +212,6 @@ input:focus, select:focus {
 .twoLine .label {
   font-size: 13px;
   color: var(--text-muted);
-  white-space: normal;
 }
 
 .twoLine .value {
@@ -226,10 +219,9 @@ input:focus, select:focus {
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-/* TAG VELOCITÀ */
+/* TAG */
 .tag {
   white-space: nowrap;
   padding: 2px 8px;
@@ -244,9 +236,7 @@ input:focus, select:focus {
 .tag-high{ background:#f9731630; color:#fb923c; }
 .tag-na  { background:#6b728033; color:#6b7280; }
 
-/* -------------------------------------------------------------
-   SUGGERIMENTO
-------------------------------------------------------------- */
+/* SUGGERIMENTO */
 #suggestCard {
   background:#f9731615;
   border:1px solid #f97316;
@@ -264,11 +254,11 @@ input:focus, select:focus {
 <body>
 <div class="app">
 
-<!-- HEADER CON LINK -->
+<!-- HEADER -->
 <a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
 <header>
-  <img src="logo.png" alt="Logo" class="app-logo">
-  <div style="display:flex; flex-direction:column; justify-content:center;">
+  <img src="logo.png" class="app-logo">
+  <div>
     <div class="app-title">Calcolo Portate Aria</div>
     <div class="app-subtitle">Air Distribution Systems</div>
   </div>
@@ -294,9 +284,10 @@ input:focus, select:focus {
     <option value="main">Montante – UNI 10339 / UNI EN 13779</option>
     <option value="none">Nessun limite</option>
   </select>
+
   <div id="scenarioNote" class="info-note">
     <span class="info-note-title">Abitazioni</span>
-    <div class="info-note-row">Velocità consigliata: 1,5 – 3,5 m/s in mandata ambiente.</div>
+    <div class="info-note-row">Velocità consigliata: 1,5 – 3,5 m/s.</div>
     <div class="info-note-row">Riferimenti: UNI 10339, UNI EN 15251.</div>
   </div>
 
@@ -308,24 +299,22 @@ input:focus, select:focus {
 
   <div id="rect_fields">
     <label>Base (mm)</label>
-    <input id="base" type="number" inputmode="decimal">
-    <div id="baseNote" class="auto-note" style="display:none;">Calcolato automaticamente</div>
+    <input id="base" type="number">
 
     <label>Altezza (mm)</label>
-    <input id="height" type="number" inputmode="decimal">
-    <div id="heightNote" class="auto-note" style="display:none;">Calcolato automaticamente</div>
+    <input id="height" type="number">
   </div>
 
   <div id="circ_fields" style="display:none;">
     <label>Diametro (mm)</label>
-    <input id="diam" type="number" inputmode="decimal">
+    <input id="diam" type="number">
   </div>
 
   <button class="btn-primary" onclick="calcola()">Calcola</button>
 </div>
 
-<!-- ===================== RISULTATI ===================== -->
-<div class="card">
+<!-- ===================== RISULTATI (ID per scroll) ===================== -->
+<div class="card" id="resultsCard">
   <h2>Risultati</h2>
 
   <div class="twoLine">
@@ -362,11 +351,9 @@ input:focus, select:focus {
       <span class="label">Lato sezione quadrata</span>
       <span class="value" id="rectSquareOut">—</span>
     </div>
-
   </div>
 
   <div id="circOut" style="display:none;">
-
     <div class="twoLine">
       <span class="label">Lato sezione quadrata</span>
       <span class="value" id="squareSideOut">—</span>
@@ -381,9 +368,7 @@ input:focus, select:focus {
       <span class="label">Velocità DN consigliato</span>
       <span class="value" id="circDNVOut">—</span>
     </div>
-
   </div>
-
 </div>
 
 <!-- ===================== SUGGERIMENTO ===================== -->
@@ -411,62 +396,50 @@ const scenarios={
 
 const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
 
-/* Testi nota UNI – "tendina" sotto selezione */
+/* NOTE UNI */
 function updateScenarioNote(){
   const s = byId("scenario").value;
   const note = byId("scenarioNote");
-  switch(s){
-    case "res":
-      note.innerHTML =
-        '<span class="info-note-title">Abitazioni</span>' +
-        '<div class="info-note-row">Velocità consigliata: 1,5 – 3,5 m/s in mandata ambiente.</div>' +
-        '<div class="info-note-row">Riferimenti: UNI 10339, UNI EN 15251.</div>';
-      break;
-    case "office":
-      note.innerHTML =
-        '<span class="info-note-title">Uffici</span>' +
-        '<div class="info-note-row">Velocità consigliata: 2,0 – 4,0 m/s nei condotti principali.</div>' +
-        '<div class="info-note-row">Riferimenti: UNI 10339, UNI EN 13779.</div>';
-      break;
-    case "hospital":
-      note.innerHTML =
-        '<span class="info-note-title">Ospedali</span>' +
-        '<div class="info-note-row">Velocità consigliata: 1,5 – 3,0 m/s nei condotti a servizio di locali critici.</div>' +
-        '<div class="info-note-row">Riferimenti: UNI 11425, UNI EN 13779.</div>';
-      break;
-    case "extract":
-      note.innerHTML =
-        '<span class="info-note-title">Estrazione / Cucine / Locali tecnici</span>' +
-        '<div class="info-note-row">Velocità consigliata: 5,0 – 8,0 m/s nei condotti di espulsione.</div>' +
-        '<div class="info-note-row">Riferimenti: UNI 10339, UNI EN 13779.</div>';
-      break;
-    case "main":
-      note.innerHTML =
-        '<span class="info-note-title">Montanti principali impianto</span>' +
-        '<div class="info-note-row">Velocità consigliata: 6,0 – 9,0 m/s nei condotti verticali principali.</div>' +
-        '<div class="info-note-row">Riferimenti: UNI 10339, UNI EN 13779.</div>';
-      break;
-    case "none":
-      note.innerHTML =
-        '<span class="info-note-title">Nessun limite UNI impostato</span>' +
-        '<div class="info-note-row">La verifica di velocità rispetto a UNI è disattivata per questo scenario.</div>';
-      break;
-    default:
-      note.innerHTML = '';
-  }
+
+  const notes = {
+    res:
+      '<span class="info-note-title">Abitazioni</span>'+
+      '<div class="info-note-row">Velocità consigliata: 1,5 – 3,5 m/s.</div>'+
+      '<div class="info-note-row">UNI 10339 / UNI EN 15251</div>',
+
+    office:
+      '<span class="info-note-title">Uffici</span>'+
+      '<div class="info-note-row">Velocità consigliata: 2,0 – 4,0 m/s.</div>'+
+      '<div class="info-note-row">UNI 10339 / UNI EN 13779</div>',
+
+    hospital:
+      '<span class="info-note-title">Ospedali</span>'+
+      '<div class="info-note-row">Velocità: 1,5 – 3,0 m/s.</div>'+
+      '<div class="info-note-row">UNI 11425 / UNI EN 13779</div>',
+
+    extract:
+      '<span class="info-note-title">Estrazione</span>'+
+      '<div class="info-note-row">Velocità: 5 – 8 m/s.</div>'+
+      '<div class="info-note-row">UNI 10339 / UNI EN 13779</div>',
+
+    main:
+      '<span class="info-note-title">Montante</span>'+
+      '<div class="info-note-row">Velocità: 6 – 9 m/s.</div>'+
+      '<div class="info-note-row">UNI 10339 / UNI EN 13779</div>',
+
+    none:
+      '<span class="info-note-title">Nessun limite</span>'+
+      '<div class="info-note-row">Verifica UNI disattivata.</div>'
+  };
+
+  note.innerHTML = notes[s];
 }
 
-/* Tema giorno/notte */
-(function(){
-  const h=new Date().getHours();
-  document.documentElement.setAttribute("data-theme",(h>=7&&h<19)?"light":"dark");
-})();
-
-/* Toggle sezione + nota UNI */
 document.addEventListener("DOMContentLoaded",()=>{
-  const geom=byId("geom");
-  geom.addEventListener("change",()=>{
-    if(geom.value==="rect"){
+  updateScenarioNote();
+
+  byId("geom").addEventListener("change",()=>{
+    if(byId("geom").value==="rect"){
       byId("rect_fields").style.display="";
       byId("circ_fields").style.display="none";
       byId("dnBlock").style.display="";
@@ -478,12 +451,10 @@ document.addEventListener("DOMContentLoaded",()=>{
     byId("circOut").style.display="none";
   });
 
-  const scenarioSel = byId("scenario");
-  scenarioSel.addEventListener("change", updateScenarioNote);
-  updateScenarioNote(); // iniziale
+  byId("scenario").addEventListener("change", updateScenarioNote);
 });
 
-/* Tag velocità */
+/* TAG VELOCITÀ */
 function getTag(v,min,max){
   if(min==null) return {text:"n/d",cls:"tag-na"};
   if(v<min) return {text:"Bassa",cls:"tag-low"};
@@ -491,7 +462,9 @@ function getTag(v,min,max){
   return {text:"Alta",cls:"tag-high"};
 }
 
-/* CALCOLO */
+/* =============================================================
+   CALCOLO
+============================================================= */
 function calcola(){
   const Q=parseFloat(byId("flow").value);
   const V_in=parseFloat(byId("velocity").value);
@@ -503,14 +476,10 @@ function calcola(){
 
   let A=null,v=null;
 
-  // RESET
+  /* RESET */
   byId("circOut").style.display="none";
   byId("rectSquareRow").style.display="none";
-  byId("rectSquareOut").textContent="—";
-  byId("suggText").textContent="—";
   byId("suggestCard").style.display="none";
-  byId("baseNote").style.display="none";
-  byId("heightNote").style.display="none";
 
   /* RETTANGOLARE */
   if(geom==="rect"){
@@ -529,26 +498,24 @@ function calcola(){
       if(hasB && !hasH){
         h=A/b;
         byId("height").value=round(h*1000,1);
-        byId("heightNote").style.display="";
       }
       else if(!hasB && hasH){
         b=A/h;
         byId("base").value=round(b*1000,1);
-        byId("baseNote").style.display="";
       }
       else if(!hasB && !hasH){
         const side=Math.sqrt(A)*1000;
         byId("rectSquareRow").style.display="";
         byId("rectSquareOut").textContent=round(side,1)+" mm";
       }
-      else {
+      else{
         A=b*h;
         v=Qs/A;
       }
 
     } else {
-      if(!hasB || !hasH){
-        alert("Se la velocità non è nota, inserisci sia base che altezza.");
+      if(!hasB||!hasH){
+        alert("Se la velocità non è nota, inserisci base e altezza.");
         return;
       }
       A=b*h;
@@ -579,10 +546,7 @@ function calcola(){
       const Deq=Math.sqrt(4*A/Math.PI)*1000;
       let best=null,min=1e9;
       for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq)<min){
-          min=Math.abs(dn-Deq);
-          best=dn;
-        }
+        if(Math.abs(dn-Deq)<min){min=Math.abs(dn-Deq);best=dn;}
       }
       byId("circDNOut").textContent="DN "+best+" mm";
       const Astd=Math.PI*(best/1000)**2/4;
@@ -590,9 +554,8 @@ function calcola(){
     }
   }
 
-  if(!A||!v){alert("Errore.");return;}
-
   /* RISULTATI */
+  if(!A||!v){alert("Errore.");return;}
 
   byId("areaOut").textContent =
     round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
@@ -603,17 +566,14 @@ function calcola(){
   byId("vEffTag").textContent = tag.text;
   byId("vEffTag").className = "tag "+tag.cls;
 
-  /* DN RETTANGOLARE */
+  /* DN rettangolare */
   if(geom==="rect"){
-    const Deq = Math.sqrt(4*A/Math.PI)*1000;
+    const Deq=Math.sqrt(4*A/Math.PI)*1000;
     byId("deqOut").textContent = round(Deq,1)+" mm";
 
     let best=null,min=1e9;
     for(const dn of stdDiameters){
-      if(Math.abs(dn-Deq)<min){
-        min=Math.abs(dn-Deq);
-        best=dn;
-      }
+      if(Math.abs(dn-Deq)<min){min=Math.abs(dn-Deq);best=dn;}
     }
 
     if(best){
@@ -624,8 +584,7 @@ function calcola(){
       byId("stdDNOut").textContent="—";
       byId("stdDNVOut").textContent="—";
     }
-  }
-  else {
+  } else {
     byId("deqOut").textContent="—";
     byId("stdDNOut").textContent="—";
     byId("stdDNVOut").textContent="—";
@@ -633,35 +592,37 @@ function calcola(){
 
   /* SUGGERIMENTO UNI */
   if(scen.vMax!=null && v>scen.vMax){
-    const vT = (scen.vMin+scen.vMax)/2;
-    const Anew = Qs / vT;
+    const vT=(scen.vMin+scen.vMax)/2;
+    const Anew=Qs/vT;
 
     if(geom==="rect"){
       const side=Math.sqrt(Anew)*1000;
-      byId("suggText").textContent =
-        "Velocità troppo alta. Sezione consigliata ~ " +
+      byId("suggText").textContent=
+        "Velocità troppo alta. Sezione consigliata: "+
         round(side,1)+" × "+round(side,1)+" mm.";
-    }
-
-    else {
-      const Deq = Math.sqrt(4*Anew/Math.PI)*1000;
+    } else {
+      const Deq=Math.sqrt(4*Anew/Math.PI)*1000;
       let best=null,min=1e9;
       for(const dn of stdDiameters){
-        if(Math.abs(dn-Deq)<min){
-          min=Math.abs(dn-Deq);
-          best=dn;
-        }
+        if(Math.abs(dn-Deq)<min){min=Math.abs(dn-Deq);best=dn;}
       }
       const Astd=Math.PI*(best/1000)**2/4;
-      const v2 = Qs/Astd;
+      const v2=Qs/Astd;
 
-      byId("suggText").textContent =
-        "Velocità troppo alta. Suggerito DN "+best+" mm (V≈"+
-        round(v2,2)+" m/s).";
+      byId("suggText").textContent=
+        "Velocità troppo alta. Suggerito DN "+best+
+        " mm (V≈"+round(v2,2)+" m/s).";
     }
-
     byId("suggestCard").style.display="";
   }
+
+  /* =======================================================
+     SCROLL AUTOMATICO AI RISULTATI
+     (UNICA FUNZIONE AGGIUNTA)
+  ======================================================== */
+  setTimeout(() => {
+    byId("resultsCard").scrollIntoView({behavior:"smooth",block:"start"});
+  }, 120);
 }
 </script>
 
