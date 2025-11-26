@@ -55,7 +55,7 @@ body {
   display: flex;
   justify-content: center;
   padding: 12px;
-  padding-top: env(safe-area-inset-top); /* evita notch */
+  padding-top: env(safe-area-inset-top); /* evita il notch */
 }
 
 .app {
@@ -64,7 +64,7 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER COMPATTO + LOGO 80PX (SAFE AREA)
+   HEADER COMPATTO + LOGO 80PX
 ------------------------------------------------------------- */
 header {
   background: var(--bg-elevated);
@@ -120,7 +120,9 @@ header {
   font-weight: 700;
 }
 
-/* INPUT */
+/* -------------------------------------------------------------
+   INPUT & SELECT (stessa altezza)
+------------------------------------------------------------- */
 label {
   font-size: 14px;
   font-weight: 600;
@@ -137,6 +139,8 @@ input, select {
   background: var(--bg-elevated);
   color: var(--text-main);
   margin-bottom: 6px;
+  height: 38px;              /* stessa altezza input/select */
+  box-sizing: border-box;
 }
 
 input:focus, select:focus {
@@ -152,7 +156,17 @@ input:focus, select:focus {
   margin-bottom: 8px;
 }
 
-/* BOTTONI */
+/* Nota sotto Scenario UNI */
+.info-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: -2px 0 8px 0;
+  line-height: 1.25;
+}
+
+/* -------------------------------------------------------------
+   BOTTONI
+------------------------------------------------------------- */
 .btn-primary {
   width: 100%;
   padding: 11px;
@@ -165,7 +179,9 @@ input:focus, select:focus {
   box-shadow: 0 8px 20px rgba(34,197,94,0.45);
 }
 
-/* RISULTATI A 2 RIGHE */
+/* -------------------------------------------------------------
+   RISULTATI A 2 RIGHE
+------------------------------------------------------------- */
 .twoLine {
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
@@ -203,7 +219,9 @@ input:focus, select:focus {
 .tag-high{ background:#f9731630; color:#fb923c; }
 .tag-na  { background:#6b728033; color:#6b7280; }
 
-/* SUGGERIMENTO */
+/* -------------------------------------------------------------
+   SUGGERIMENTO
+------------------------------------------------------------- */
 #suggestCard {
   background:#f9731615;
   border:1px solid #f97316;
@@ -251,6 +269,9 @@ input:focus, select:focus {
     <option value="main">Montante</option>
     <option value="none">Nessun limite</option>
   </select>
+  <div id="scenarioNote" class="info-note">
+    Abitazioni: 1,5 – 3,5 m/s in mandata ambiente (UNI 10339, UNI EN 15251).
+  </div>
 
   <label>Tipo sezione</label>
   <select id="geom">
@@ -281,7 +302,7 @@ input:focus, select:focus {
   <h2>Risultati</h2>
 
   <div class="twoLine">
-    <span class="label">Area A</span>
+    <span class="label">Area</span>
     <span class="value" id="areaOut">—</span>
   </div>
 
@@ -338,41 +359,6 @@ input:focus, select:focus {
 
 </div>
 
-<!-- ===================== NORMATIVE UNI ===================== -->
-<div class="card">
-  <h2>Normative UNI</h2>
-
-  <div class="twoLine">
-    <span class="label">Abitazioni (UNI 10339 / UNI EN 15251)</span>
-    <span class="value">1.5 – 3.5 m/s</span>
-  </div>
-
-  <div class="twoLine">
-    <span class="label">Uffici (UNI 10339 / UNI EN 13779)</span>
-    <span class="value">2.0 – 4.0 m/s</span>
-  </div>
-
-  <div class="twoLine">
-    <span class="label">Ospedali (UNI 11425 / UNI EN 13779)</span>
-    <span class="value">1.5 – 3.0 m/s</span>
-  </div>
-
-  <div class="twoLine">
-    <span class="label">Estrazioni Cucine / Locali Tecnici</span>
-    <span class="value">5.0 – 8.0 m/s</span>
-  </div>
-
-  <div class="twoLine">
-    <span class="label">Montanti Principali Impianto</span>
-    <span class="value">6.0 – 9.0 m/s</span>
-  </div>
-
-  <div class="twoLine">
-    <span class="label">Nessun limite</span>
-    <span class="value">—</span>
-  </div>
-</div>
-
 <!-- ===================== SUGGERIMENTO ===================== -->
 <div class="card" id="suggestCard" style="display:none;">
   <h2>Suggerimento</h2>
@@ -398,13 +384,41 @@ const scenarios={
 
 const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
 
+/* Testi nota UNI */
+function updateScenarioNote(){
+  const s = byId("scenario").value;
+  const note = byId("scenarioNote");
+  switch(s){
+    case "res":
+      note.textContent = "Abitazioni: 1,5 – 3,5 m/s in mandata ambiente (UNI 10339, UNI EN 15251).";
+      break;
+    case "office":
+      note.textContent = "Uffici: 2,0 – 4,0 m/s nei condotti principali (UNI 10339, UNI EN 13779).";
+      break;
+    case "hospital":
+      note.textContent = "Ospedali: 1,5 – 3,0 m/s nei condotti a servizio di locali critici (UNI 11425, UNI EN 13779).";
+      break;
+    case "extract":
+      note.textContent = "Estrazione / cucine / locali tecnici: 5,0 – 8,0 m/s nei condotti di espulsione.";
+      break;
+    case "main":
+      note.textContent = "Montanti principali impianto: 6,0 – 9,0 m/s nei condotti verticali principali.";
+      break;
+    case "none":
+      note.textContent = "Nessun limite: il controllo velocità UNI è disattivato.";
+      break;
+    default:
+      note.textContent = "";
+  }
+}
+
 /* Tema giorno/notte */
 (function(){
   const h=new Date().getHours();
   document.documentElement.setAttribute("data-theme",(h>=7&&h<19)?"light":"dark");
 })();
 
-/* Toggle sezione */
+/* Toggle sezione + nota UNI */
 document.addEventListener("DOMContentLoaded",()=>{
   const geom=byId("geom");
   geom.addEventListener("change",()=>{
@@ -419,6 +433,10 @@ document.addEventListener("DOMContentLoaded",()=>{
     }
     byId("circOut").style.display="none";
   });
+
+  const scenarioSel = byId("scenario");
+  scenarioSel.addEventListener("change", updateScenarioNote);
+  updateScenarioNote(); // iniziale
 });
 
 /* Tag velocità */
@@ -605,4 +623,3 @@ function calcola(){
 
 </body>
 </html>
-
