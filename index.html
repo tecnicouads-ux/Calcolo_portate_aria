@@ -407,121 +407,212 @@ function getTag(v,min,max){
    CALCOLO
 ============================================================= */
 function calcola(){
-  const Q=parseFloat(byId("flow").value);
-  const V_in=parseFloat(byId("velocity").value);
-  const geom=byId("geom").value;
-  const scen=scenarios[byId("scenario").value];
+  const Q_raw = parseFloat(byId("flow").value);
+  let Q = (!isNaN(Q_raw) && Q_raw>0) ? Q_raw : null;
 
-  if(!Q||Q<=0){alert("Inserisci Q > 0");return;}
+  const V_raw = parseFloat(byId("velocity").value);
+  const V_in = (!isNaN(V_raw) && V_raw>0) ? V_raw : null;
 
-  const Qs=Q/3600;
-  let A=null,v=null;
+  const geom = byId("geom").value;
+  const scen = scenarios[byId("scenario").value];
 
+  // Serve almeno portata o velocità
+  if(!Q && !V_in){
+    alert("Inserisci almeno Portata Q oppure Velocità V > 0");
+    return;
+  }
+
+  let A = null;   // area [m²]
+  let v = null;   // velocità effettiva [m/s]
+
+  // reset viste
   byId("circOut").style.display="none";
   byId("rectSquareRow").style.display="none";
   byId("suggestCard").style.display="none";
 
-  /* RETTANGOLARE */
+  /* ===================== RETTANGOLARE ===================== */
   if(geom==="rect"){
-    const bMm=parseFloat(byId("base").value);
-    const hMm=parseFloat(byId("height").value);
-    let b=bMm?bMm/1000:null;
-    let h=hMm?hMm/1000:null;
+    const bMm = parseFloat(byId("base").value);
+    const hMm = parseFloat(byId("height").value);
+    let b = (!isNaN(bMm) && bMm>0) ? bMm/1000 : null;
+    let h = (!isNaN(hMm) && hMm>0) ? hMm/1000 : null;
 
-    if(V_in){
-      A=Qs/V_in;
-      v=V_in;
+    if(Q){ // PORTATA NOTA
+      const Qs_tmp = Q/3600;
 
-      if(b && !h){
-        h=A/b; byId("height").value=round(h*1000,1);
-      } else if(!b && h){
-        b=A/h; byId("base").value=round(b*1000,1);
-      } else if(!b && !h){
-        const side=Math.sqrt(A)*1000;
-        byId("rectSquareRow").style.display="";
-        byId("rectSquareOut").textContent=round(side,1)+" mm";
+      if(V_in){
+        // Caso "classico" originale: da Q e V ricavo A
+        A = Qs_tmp / V_in;
+        v = V_in;
+
+        if(b && !h){
+          h = A/b;
+          byId("height").value = round(h*1000,1);
+        } else if(!b && h){
+          b = A/h;
+          byId("base").value = round(b*1000,1);
+        } else if(!b && !h){
+          const side = Math.sqrt(A)*1000;
+          byId("rectSquareRow").style.display="";
+          byId("rectSquareOut").textContent = round(side,1)+" mm";
+        } else {
+          // Tutte e due inserite → ricalcolo v dalla sezione reale
+          A = b*h;
+          v = Qs_tmp / A;
+        }
+
       } else {
-        A=b*h; v=Qs/A;
+        // Niente velocità → servono base e altezza
+        if(!b || !h){
+          alert("Se la velocità non è nota, inserisci base e altezza.");
+          return;
+        }
+        A = b*h;
+        v = Qs_tmp / A;
       }
 
     } else {
-      if(!b||!h){alert("Se la velocità non è nota, inserisci base e altezza.");return;}
-      A=b*h; v=Qs/A;
+      // PORTATA NON NOTA → uso V_in + dimensioni per ricavare Q
+      if(!V_in){
+        alert("Se la portata non è nota, inserisci una velocità V > 0.");
+        return;
+      }
+      if(!b || !h){
+        alert("Se la portata non è nota, inserisci base e altezza.");
+        return;
+      }
+      A = b*h;
+      v = V_in;
     }
   }
 
-  /* CIRCOLARE */
+  /* ===================== CIRCOLARE ===================== */
   if(geom==="circ"){
-    const dMm=parseFloat(byId("diam").value);
+    const dMm = parseFloat(byId("diam").value);
+    const d = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
 
-    if(V_in){
-      A=Qs/V_in; v=V_in;
+    if(Q){ // PORTATA NOTA
+      const Qs_tmp = Q/3600;
+
+      if(V_in){
+        // Da Q e V ricavo area equivalente
+        A = Qs_tmp / V_in;
+        v = V_in;
+      } else {
+        if(!d){
+          alert("Se la velocità non è nota, inserisci diametro.");
+          return;
+        }
+        A = Math.PI*d*d/4;
+        v = Qs_tmp / A;
+      }
+
     } else {
-      if(!dMm){alert("Se V non è nota, inserisci diametro.");return;}
-      const d=dMm/1000;
-      A=Math.PI*d*d/4; v=Qs/A;
+      // PORTATA NON NOTA → uso V_in + diametro
+      if(!V_in){
+        alert("Se la portata non è nota, inserisci una velocità V > 0.");
+        return;
+      }
+      if(!d){
+        alert("Se la portata non è nota, inserisci il diametro.");
+        return;
+      }
+      A = Math.PI*d*d/4;
+      v = V_in;
     }
 
+    // Blocco risultati specifico per circolare
     byId("circOut").style.display="";
-    byId("squareSideOut").textContent=round(Math.sqrt(A)*1000,1)+" mm";
-
-    if(V_in && !dMm){
-      const Deq=Math.sqrt(4*A/Math.PI)*1000;
-      let best=null,m=1e9;
-      for(const dn of stdDiameters){if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}}
-      byId("circDNOut").textContent="DN "+best+" mm";
-      byId("circDNVOut").textContent=
-        round(Qs/(Math.PI*(best/1000)**2/4),2)+" m/s";
-    }
+    byId("squareSideOut").textContent = round(Math.sqrt(A)*1000,1)+" mm";
   }
 
-  if(!A||!v){alert("Errore.");return;}
+  if(!A || !v){
+    alert("Errore.");
+    return;
+  }
 
-  /* RISULTATI */
-  byId("areaOut").textContent=
+  // Ora, se Q era sconosciuta, la ricavo da A e v
+  let Qs;
+  if(Q && Q>0){
+    Qs = Q/3600;
+  } else {
+    Qs = v*A;
+    Q  = Qs*3600;
+    byId("flow").value = Math.round(Q); // aggiorno campo portata
+  }
+
+  /* ===================== RISULTATI GENERALI ===================== */
+  byId("areaOut").textContent =
     round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
-  byId("vEffOut").textContent=round(v,2)+" m/s";
+  byId("vEffOut").textContent = round(v,2)+" m/s";
 
-  const tag=getTag(v,scen.vMin,scen.vMax);
-  byId("vEffTag").textContent=tag.text;
-  byId("vEffTag").className="tag "+tag.cls;
+  const tag = getTag(v,scen.vMin,scen.vMax);
+  byId("vEffTag").textContent = tag.text;
+  byId("vEffTag").className = "tag "+tag.cls;
 
   /* Ø STANDARD rettangolare */
   if(geom==="rect"){
-    const Deq=Math.sqrt(4*A/Math.PI)*1000;
-
-    let best=null,m=1e9;
-    for(const dn of stdDiameters){if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}}
+    const Deq = Math.sqrt(4*A/Math.PI)*1000;
+    let best = null, m = 1e9;
+    for(const dn of stdDiameters){
+      if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}
+    }
 
     if(best){
-      byId("stdDNOut").textContent="Ø "+best+" mm";
-      byId("stdDNVOut").textContent=
+      byId("stdDNOut").textContent = "Ø "+best+" mm";
+      byId("stdDNVOut").textContent =
         round(Qs/(Math.PI*(best/1000)**2/4),2)+" m/s";
     } else {
-      byId("stdDNOut").textContent="—";
-      byId("stdDNVOut").textContent="—";
+      byId("stdDNOut").textContent  = "—";
+      byId("stdDNVOut").textContent = "—";
     }
   } else {
-    byId("stdDNOut").textContent="—";
-    byId("stdDNVOut").textContent="—";
+    byId("stdDNOut").textContent  = "—";
+    byId("stdDNVOut").textContent = "—";
+  }
+
+  /* DN consigliato per circolare (solo se V inserita e diametro NON inserito) */
+  if(geom==="circ"){
+    const dMm = parseFloat(byId("diam").value);
+    const d = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
+    if(V_in && !d){
+      const Deq = Math.sqrt(4*A/Math.PI)*1000;
+      let best = null, m = 1e9;
+      for(const dn of stdDiameters){
+        if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}
+      }
+      if(best){
+        byId("circDNOut").textContent = "DN "+best+" mm";
+        byId("circDNVOut").textContent =
+          round(Qs/(Math.PI*(best/1000)**2/4),2)+" m/s";
+      } else {
+        byId("circDNOut").textContent  = "—";
+        byId("circDNVOut").textContent = "—";
+      }
+    } else {
+      byId("circDNOut").textContent  = byId("circDNOut").textContent || "—";
+      byId("circDNVOut").textContent = byId("circDNVOut").textContent || "—";
+    }
   }
 
   /* SUGGERIMENTO */
   if(scen.vMax!=null && v>scen.vMax){
-    const vT=(scen.vMin+scen.vMax)/2;
-    const Anew=Qs/vT;
+    const vT = (scen.vMin+scen.vMax)/2;
+    const Anew = Qs/vT;
 
     if(geom==="rect"){
-      const side=Math.sqrt(Anew)*1000;
-      byId("suggText").textContent=
+      const side = Math.sqrt(Anew)*1000;
+      byId("suggText").textContent =
         "Velocità alta → sezione consigliata: "+
         round(side,1)+" × "+round(side,1)+" mm.";
     } else {
-      const Deq=Math.sqrt(4*Anew/Math.PI)*1000;
-      let best=null,m=1e9;
-      for(const dn of stdDiameters){if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}}
-      const v2=Qs/(Math.PI*(best/1000)**2/4);
-      byId("suggText").textContent=
+      const Deq = Math.sqrt(4*Anew/Math.PI)*1000;
+      let best = null, m = 1e9;
+      for(const dn of stdDiameters){
+        if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}
+      }
+      const v2 = Qs/(Math.PI*(best/1000)**2/4);
+      byId("suggText").textContent =
         "Velocità alta → DN consigliato "+best+
         " mm (V≈"+round(v2,2)+" m/s).";
     }
