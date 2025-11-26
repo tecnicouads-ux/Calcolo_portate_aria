@@ -366,6 +366,7 @@ function calcola(){
   byId("rectSquareRow").style.display="none";
   byId("suggestCard").style.display="none";
 
+  /* ===================== RETTANGOLARE ===================== */
   if(geom==="rect"){
     const bMm = parseFloat(byId("base").value);
     const hMm = parseFloat(byId("height").value);
@@ -417,17 +418,49 @@ function calcola(){
     }
   }
 
+  /* ===================== CIRCOLARE ===================== */
   if(geom==="circ"){
-    const dMm = parseFloat(byId("diam").value);
-    const d = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
+    let dMm = parseFloat(byId("diam").value);
+    let d   = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
 
     if(Q){
       const Qs_tmp = Q/3600;
 
       if(V_in){
-        A = Qs_tmp / V_in;
-        v = V_in;
+        // Caso Q e V note:
+        // se il diametro NON è inserito, calcolo DN standard più vicino
+        if(!d){
+          const Aideal = Qs_tmp / V_in; // area ideale
+          const Deq = Math.sqrt(4*Aideal/Math.PI)*1000; // diametro ideale [mm]
+
+          let best = null, m = 1e9;
+          for(const dn of stdDiameters){
+            const diff = Math.abs(dn - Deq);
+            if(diff < m){
+              m = diff;
+              best = dn;
+            }
+          }
+
+          if(best){
+            byId("diam").value = best;
+            dMm = best;
+            d   = best/1000;
+          }
+        }
+
+        if(!d){
+          // fallback improbabile: uso comunque A da Q e V
+          A = Qs_tmp / V_in;
+          v = V_in;
+        } else {
+          // uso DN (inserito o appena scelto) e ricalcolo v reale
+          A = Math.PI*d*d/4;
+          v = Qs_tmp / A;
+        }
+
       } else {
+        // Nessuna velocità: uso Q + diametro
         if(!d){
           alert("Se la velocità non è nota, inserisci diametro.");
           return;
@@ -437,6 +470,7 @@ function calcola(){
       }
 
     } else {
+      // PORTATA NON NOTA → uso V_in + diametro
       if(!V_in){
         alert("Se la portata non è nota, inserisci una velocità V > 0.");
         return;
@@ -495,7 +529,7 @@ function calcola(){
     byId("stdDNVOut").textContent="—";
   }
 
-  /* SUGGERIMENTO aggiornato */
+  /* SUGGERIMENTO */
   if(scen.vMax!=null && v>scen.vMax){
     const vT = (scen.vMin+scen.vMax)/2;
     const Anew = Qs/vT;
@@ -503,10 +537,12 @@ function calcola(){
     const L = Math.sqrt(Anew)*1000;  // lato quadrato in mm
 
     let best = null, m = 1e9;
+    const DeqNew = Math.sqrt(4*Anew/Math.PI)*1000;
     for(const dn of stdDiameters){
-      if(Math.abs(dn-(Math.sqrt(4*Anew/Math.PI)*1000))<m){
-        m=Math.abs(dn-(Math.sqrt(4*Anew/Math.PI)*1000));
-        best=dn;
+      const diff = Math.abs(dn - DeqNew);
+      if(diff < m){
+        m = diff;
+        best = dn;
       }
     }
 
