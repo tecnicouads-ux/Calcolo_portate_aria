@@ -27,9 +27,8 @@
   --text-main: #111827;
   --text-muted: #6b7280;
 
-  /* Ombre un po' più morbide stile iOS */
-  --shadow-header: rgba(15,23,42,0.08);
-  --shadow-strong: rgba(15,23,42,0.10);
+  --shadow-header: rgba(148,163,184,0.25);
+  --shadow-strong: rgba(148,163,184,0.35);
 }
 
 /* -------------------------------------------------------------
@@ -57,7 +56,7 @@ header {
   background: var(--bg-elevated);
   padding: calc(6px + env(safe-area-inset-top)) 10px 6px 10px;
   border-radius: 14px;
-  box-shadow: 0 10px 24px var(--shadow-header);
+  box-shadow: 0 8px 18px var(--shadow-header);
   border: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
@@ -85,7 +84,7 @@ header {
   border-radius: 16px;
   margin-bottom: 16px;
   border: 1px solid var(--border-soft);
-  box-shadow: 0 12px 28px var(--shadow-strong);
+  box-shadow: 0 10px 24px var(--shadow-strong);
 }
 .card h2 { margin: 0 0 10px; font-size: 16px; font-weight: 700; }
 
@@ -124,31 +123,20 @@ input, select {
 }
 .info-note-row { font-size: 12px; display: block; }
 
-/* -------------------------------------------------------------
-   BOTTONI – più “gommoso” + effetto press
-------------------------------------------------------------- */
+/* Buttons */
 .btn-primary {
   width: 100%;
-  padding: 12px 16px;
+  padding: 11px;
   border-radius: 999px;
   font-size: 15px;
   font-weight: 700;
   background: var(--accent);
   color: #ffffff;
   border: none;
-  box-shadow: 0 10px 22px rgba(22,163,74,0.55);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  box-shadow: 0 8px 20px rgba(22,163,74,0.45);
 }
 
-.btn-primary:active {
-  transform: translateY(1px) scale(0.97);
-  box-shadow: 0 6px 14px rgba(22,163,74,0.35);
-  filter: brightness(0.97);
-}
-
-/* -------------------------------------------------------------
-   RISULTATI
-------------------------------------------------------------- */
+/* Results */
 .twoLine {
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
@@ -173,9 +161,7 @@ input, select {
 .tag-high{ background:#f9731630; color:#f97316; }
 .tag-na { background:#6b728033; color:#6b7280; }
 
-/* -------------------------------------------------------------
-   SUGGERIMENTO
-------------------------------------------------------------- */
+/* Suggestion */
 #suggestCard {
   background:#f9731615;
   border:1px solid #f97316;
@@ -185,22 +171,6 @@ input, select {
   overflow-wrap: break-word;
   font-size: 14px;
   line-height: 1.35;
-}
-
-/* -------------------------------------------------------------
-   ANIMAZIONE CAMBIO SEZIONE (rettangolare ↔ circolare)
-------------------------------------------------------------- */
-.fade-section {
-  transition: opacity 0.18s ease, transform 0.18s ease, height 0.18s ease, margin 0.18s ease;
-  overflow: hidden;
-}
-
-.hidden-section {
-  opacity: 0;
-  transform: translateY(4px);
-  height: 0;
-  margin: 0;
-  pointer-events: none;
 }
 </style>
 </head>
@@ -249,7 +219,7 @@ input, select {
     <option value="circ">Circolare</option>
   </select>
 
-  <div id="rect_fields" class="fade-section">
+  <div id="rect_fields">
     <label>Base (mm)</label>
     <input id="base" type="number" inputmode="decimal">
 
@@ -257,7 +227,7 @@ input, select {
     <input id="height" type="number" inputmode="decimal">
   </div>
 
-  <div id="circ_fields" class="fade-section hidden-section">
+  <div id="circ_fields" style="display:none;">
     <label>Diametro (mm)</label>
     <input id="diam" type="number" inputmode="numeric">
   </div>
@@ -349,17 +319,13 @@ document.addEventListener("DOMContentLoaded",()=>{
   updateScenarioNote();
 
   byId("geom").addEventListener("change",()=>{
-    const isRect = (byId("geom").value==="rect");
-    const rect = byId("rect_fields");
-    const circ = byId("circ_fields");
-
-    if(isRect){
-      rect.classList.remove("hidden-section");
-      circ.classList.add("hidden-section");
+    if(byId("geom").value==="rect"){
+      byId("rect_fields").style.display="";
+      byId("circ_fields").style.display="none";
       byId("dnBlock").style.display="";
     } else {
-      rect.classList.add("hidden-section");
-      circ.classList.remove("hidden-section");
+      byId("rect_fields").style.display="none";
+      byId("circ_fields").style.display="";
       byId("dnBlock").style.display="none";
     }
     byId("circOut").style.display="none";
@@ -484,7 +450,7 @@ function calcola(){
         }
 
         if(!d){
-          // fallback: uso comunque A da Q e V
+          // fallback improbabile: uso comunque A da Q e V
           A = Qs_tmp / V_in;
           v = V_in;
         } else {
