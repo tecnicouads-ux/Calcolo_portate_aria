@@ -6,8 +6,8 @@
   "scripts": {
     "build:web": "node scripts/build-web.mjs",
     "build:icons": "node scripts/build-icons.mjs",
-    "android:init": "npm run build:web && npx cap add android && npx cap sync android && npm run build:icons && npx capacitor-assets generate --android",
-    "cap:sync": "npm run build:web && npx cap sync android && npm run build:icons && npx capacitor-assets generate --android",
+    "android:init": "npm run build:icons && npm run build:web && npx cap add android && npx cap sync android && npx capacitor-assets generate --android",
+    "cap:sync": "npm run build:icons && npm run build:web && npx cap sync android && npx capacitor-assets generate --android",
     "android:open": "npm run cap:sync && npx cap open android",
     "android:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
     "android:bundle": "npm run cap:sync && cd android && ./gradlew bundleRelease"
