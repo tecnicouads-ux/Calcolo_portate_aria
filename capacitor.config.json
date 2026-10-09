@@ -1,0 +1,8 @@
+{
+  "appId": "it.airdistributionsystems.calcoloportatearia",
+  "appName": "Calcolo Portate Aria",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "calcolo-portate-aria",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calcolo Portate Aria - Android via Capacitor",
+  "scripts": {
+    "build:web": "node scripts/build-web.mjs",
+    "android:init": "npm run build:web && npx cap add android && npx cap sync android",
+    "cap:sync": "npm run build:web && npx cap sync android",
+    "android:open": "npm run cap:sync && npx cap open android",
+    "android:debug": "npm run cap:sync && cd android && ./gradlew assembleDebug",
+    "android:bundle": "npm run cap:sync && cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/core": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "8.5.3"
+  }
+}
