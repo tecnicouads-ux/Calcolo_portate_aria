@@ -6,7 +6,7 @@ La versione Android usa Capacitor e incorpora la web app esistente senza modific
 - Node.js 22
 - Android Studio
 - Android SDK 36
-- JDK 17
+- JDK 21
 
 ## Prima configurazione
 
@@ -44,7 +44,7 @@ Poi in Android Studio usa:
 
 Configurazione iniziale:
 - App name: **Calcolo Portate Aria**
-- Package ID: `it.airdistributionsystems.calcoloportatearia`
+- Package ID: `it.calcoloportatearia.app`
 - Target/Compile SDK: **36**
 - Version name: **1.0**
 - Version code: **1**
