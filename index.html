@@ -1,47 +1,637 @@
-<!doctype html>
-<html lang="it">
+<!DOCTYPE html>
+<html lang="it" data-theme="light">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Privacy Policy - Calcolo Portate Aria</title>
-  <style>
-    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:820px;margin:0 auto;padding:32px 20px;line-height:1.6;color:#1f2937;background:#fff}
-    h1{font-size:2rem;margin-bottom:.25rem}
-    h2{margin-top:2rem;font-size:1.2rem}
-    .muted{color:#6b7280}
-  </style>
+  <meta charset="UTF-8">
+  <title>Calcolo Portate Aria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Icona app su iPhone -->
+  <link rel="apple-touch-icon" href="logo-app.png">
+  <meta name="apple-mobile-web-app-title" content="ADS Air">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+<style>
+/* -------------------------------------------------------------
+   TEMA E COLORI (LIGHT FISSO)
+------------------------------------------------------------- */
+:root {
+  --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+
+  --bg: #f3f4f6;
+  --bg-elevated: #ffffff;
+  --card-soft: #ffffff;
+
+  /* 🔵 Cambiato qui (Pantone 285C) */
+  --accent: #2A6EBB;
+  --accent-soft: rgba(42,110,187,0.18);
+
+  --border: #cbd5e1;
+  --border-soft: #e5e7eb;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+
+  --shadow-header: rgba(148,163,184,0.25);
+  --shadow-strong: rgba(148,163,184,0.35);
+}
+
+/* -------------------------------------------------------------
+   STRUTTURA (SAFE AREA NOTCH)
+------------------------------------------------------------- */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  font-size: 15px;
+  line-height: 1.32;
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  padding-top: env(safe-area-inset-top);
+}
+
+.app {
+  width: 100%;
+  max-width: 520px;
+}
+
+/* -------------------------------------------------------------
+   HEADER
+------------------------------------------------------------- */
+header {
+  background: var(--bg-elevated);
+  padding: calc(6px + env(safe-area-inset-top)) 10px 6px 10px;
+  border-radius: 14px;
+  box-shadow: 0 8px 18px var(--shadow-header);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  min-height: 70px;
+}
+
+.app-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.app-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* -------------------------------------------------------------
+   CARD
+------------------------------------------------------------- */
+.card {
+  background: var(--card-soft);
+  padding: 14px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 10px 24px var(--shadow-strong);
+}
+
+.card h2 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* -------------------------------------------------------------
+   INPUT & SELECT
+------------------------------------------------------------- */
+label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  font-size: 15px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  margin-bottom: 6px;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+/* -------------------------------------------------------------
+   NOTE
+------------------------------------------------------------- */
+.info-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: -2px 0 8px 0;
+  line-height: 1.3;
+
+  /* 🔵 Cambiato colore barra sinistra */
+  border-left: 3px solid #2A6EBB;
+
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(148,163,184,0.10);
+}
+
+.info-note-row {
+  font-size: 12px;
+  white-space: normal !important;
+  display: block;
+}
+
+/* -------------------------------------------------------------
+   BOTTONI
+------------------------------------------------------------- */
+.btn-primary {
+  width: 100%;
+  padding: 11px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+
+  /* 🔵 Cambiato colore */
+  background: #2A6EBB;
+
+  color: #ffffff;
+  border: none;
+
+  /* 🔵 Ombra blu */
+  box-shadow: 0 8px 20px rgba(42,110,187,0.45);
+
+  margin-top: 10px;
+}
+
+/* -------------------------------------------------------------
+   RISULTATI
+------------------------------------------------------------- */
+.twoLine {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.twoLine .label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.twoLine .value {
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* TAG */
+.tag {
+  white-space: nowrap;
+  padding: 2px 8px;
+  font-size: 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+.tag-ok  { background:#16a34a33; color:#16a34a; }
+.tag-low { background:#2563eb30; color:#2563eb; }
+.tag-high{ background:#f9731630; color:#f97316; }
+.tag-na  { background:#6b728033; color:#6b7280; }
+
+/* -------------------------------------------------------------
+   SUGGERIMENTO
+------------------------------------------------------------- */
+#suggestCard {
+  background:#f9731615;
+  border:1px solid #f97316;
+}
+#suggText {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+  font-size: 14px;
+  line-height: 1.35;
+}
+</style>
 </head>
+
 <body>
-  <h1>Privacy Policy – Calcolo Portate Aria</h1>
-  <p class="muted">Ultimo aggiornamento: 12 ottobre 2026</p>
+<div class="app">
 
-  <p><strong>Calcolo Portate Aria</strong> è un'applicazione di calcolo tecnico. L'app funziona localmente sul dispositivo e non richiede la creazione di un account.</p>
+<!-- HEADER -->
+<a href="https://www.airdistributionsystems.it/home.php" target="_blank" style="text-decoration:none; color:inherit;">
+<header>
+  <img src="logo.png" class="app-logo">
+  <div>
+    <div class="app-title">Calcolo Portate Aria</div>
+    <div class="app-subtitle">Air Distribution Systems</div>
+  </div>
+</header>
+</a>
 
-  <h2>Dati raccolti</h2>
-  <p>L'app non raccoglie, memorizza, trasmette o condivide dati personali dell'utente.</p>
+<!-- ===================== INPUT ===================== -->
+<div class="card">
+  <h2>Input</h2>
 
-  <h2>Dati inseriti nell'app</h2>
-  <p>I valori inseriti dall'utente per effettuare i calcoli vengono elaborati esclusivamente sul dispositivo e non vengono inviati a server esterni.</p>
+  <label>Portata Q (m³/h)</label>
+  <input id="flow" type="number" inputmode="decimal">
 
-  <h2>Account e autenticazione</h2>
-  <p>L'app non prevede registrazione, autenticazione o creazione di account.</p>
+  <label>Velocità V (m/s) (opzionale)</label>
+  <input id="velocity" type="number" inputmode="decimal">
 
-  <h2>Pubblicità e tracciamento</h2>
-  <p>L'app non contiene pubblicità, strumenti di analytics o sistemi di tracciamento dell'utente.</p>
+  <label>Scenario UNI (riferimento normativa)</label>
+  <select id="scenario">
+    <option value="res">Abitazione – UNI 10339 / UNI EN 15251</option>
+    <option value="office">Uffici – UNI 10339 / UNI EN 13779</option>
+    <option value="hospital">Ospedale – UNI 11425 / UNI EN 13779</option>
+    <option value="extract">Estrazione – UNI 10339 / UNI EN 13779</option>
+    <option value="main">Montante – UNI 10339 / UNI EN 13779</option>
+    <option value="none">Nessun limite</option>
+  </select>
 
-  <h2>Permessi del dispositivo</h2>
-  <p>L'app non richiede accesso a posizione, fotocamera, microfono, contatti, foto o altri dati personali sensibili per il proprio funzionamento.</p>
+  <div id="scenarioNote" class="info-note">
+    <span class="info-note-row">Abitazioni – 1.5–3.5 m/s – UNI 10339 / UNI EN 15251</span>
+  </div>
 
-  <h2>Condivisione con terze parti</h2>
-  <p>L'app non condivide dati dell'utente con terze parti.</p>
+  <label>Geometria del condotto</label>
+  <select id="geom">
+    <option value="rect">Rettangolare</option>
+    <option value="circ">Circolare</option>
+  </select>
 
-  <h2>Minori</h2>
-  <p>L'app non raccoglie dati personali di minori o di altri utenti.</p>
+  <div id="rect_fields">
+    <label>Base (mm)</label>
+    <input id="base" type="number" inputmode="decimal">
 
-  <h2>Modifiche alla presente informativa</h2>
-  <p>La presente informativa potrà essere aggiornata in caso di modifiche alle funzionalità dell'app o alle modalità di trattamento dei dati.</p>
+    <label>Altezza (mm)</label>
+    <input id="height" type="number" inputmode="decimal">
+  </div>
 
-  <h2>Contatti</h2>
-  <p>Per richieste relative alla privacy è possibile utilizzare l'indirizzo email dello sviluppatore indicato nella scheda dell'app su Google Play.</p>
+  <div id="circ_fields" style="display:none;">
+    <label>Diametro (mm)</label>
+    <input id="diam" type="number" inputmode="numeric">
+  </div>
+
+  <button class="btn-primary" onclick="calcola()">Calcola</button>
+</div>
+
+<!-- ===================== RISULTATI ===================== -->
+<div class="card" id="resultsCard">
+  <h2>Risultati</h2>
+
+  <div class="twoLine">
+    <span class="label">Area</span>
+    <span class="value" id="areaOut">—</span>
+  </div>
+
+  <div class="twoLine">
+    <span class="label">Velocità</span>
+    <span class="value">
+      <span id="vEffOut">—</span>
+      <span id="vEffTag" class="tag tag-na">n/d</span>
+    </span>
+  </div>
+
+  <div id="dnBlock">
+
+    <div class="twoLine">
+      <span class="label">Ø standard</span>
+      <span class="value" id="stdDNOut">—</span>
+    </div>
+
+    <div class="twoLine">
+      <span class="label">Velocità Ø</span>
+      <span class="value" id="stdDNVOut">—</span>
+    </div>
+
+    <div id="rectSquareRow" class="twoLine" style="display:none;">
+      <span class="label">Lato sezione quadrata</span>
+      <span class="value" id="rectSquareOut">—</span>
+    </div>
+  </div>
+
+  <div id="circOut" style="display:none;">
+    <div class="twoLine">
+      <span class="label">Lato sezione quadrata</span>
+      <span class="value" id="squareSideOut">—</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SUGGERIMENTO ===================== -->
+<div class="card" id="suggestCard" style="display:none;">
+  <h2>Suggerimento</h2>
+  <div class="twoLine">
+    <span class="label">Consiglio normativa UNI</span>
+    <span class="value" id="suggText">—</span>
+  </div>
+</div>
+
+<!-- ===================== SCRIPT ===================== -->
+<script>
+function byId(i){return document.getElementById(i);}
+function round(v,d){return Math.round(v*10**d)/10**d;}
+
+const scenarios={
+  res:{vMin:1.5,vMax:3.5},
+  office:{vMin:2.0,vMax:4.0},
+  hospital:{vMin:1.5,vMax:3.0},
+  extract:{vMin:5.0,vMax:8.0},
+  main:{vMin:6.0,vMax:9.0},
+  none:{vMin:null,vMax:null}
+};
+
+const stdDiameters=[100,125,150,160,200,250,315,355,400,450,500,560,600];
+
+/* NOTE UNI UNA RIGA */
+function updateScenarioNote(){
+  const s = byId("scenario").value;
+  const note = byId("scenarioNote");
+
+  const notes = {
+    res:
+      '<span class="info-note-row">Abitazioni – 1.5–3.5 m/s – UNI 10339 / UNI EN 15251</span>',
+    office:
+      '<span class="info-note-row">Uffici – 2–4 m/s – UNI 10339 / UNI EN 13779</span>',
+    hospital:
+      '<span class="info-note-row">Ospedali – 1.5–3 m/s – UNI 11425 / UNI EN 13779</span>',
+    extract:
+      '<span class="info-note-row">Estrazione – 5–8 m/s – UNI 10339 / UNI EN 13779</span>',
+    main:
+      '<span class="info-note-row">Montanti – 6–9 m/s – UNI 10339 / UNI EN 13779</span>',
+    none:
+      '<span class="info-note-row">Nessun limite – verifica disattivata</span>'
+  };
+
+  note.innerHTML = notes[s];
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+  updateScenarioNote();
+
+  byId("geom").addEventListener("change",()=>{
+    if(byId("geom").value==="rect"){
+      byId("rect_fields").style.display="";
+      byId("circ_fields").style.display="none";
+      byId("dnBlock").style.display="";
+    } else {
+      byId("rect_fields").style.display="none";
+      byId("circ_fields").style.display="";
+      byId("dnBlock").style.display="none";
+    }
+    byId("circOut").style.display="none";
+  });
+
+  byId("scenario").addEventListener("change", updateScenarioNote);
+
+  /* ========== AUTO-SELECT su tutti gli input numerici ========== */
+  const inputs = document.querySelectorAll('input[type="number"]');
+  inputs.forEach(inp=>{
+    inp.addEventListener('focus', function(){
+      setTimeout(()=>{ this.select(); }, 0);
+    });
+    inp.addEventListener('mouseup', function(e){
+      e.preventDefault();
+    });
+  });
+  /* ============================================================= */
+
+});
+
+function getTag(v,min,max){
+  if(min==null) return {text:"n/d",cls:"tag-na"};
+  if(v<min)    return {text:"Bassa",cls:"tag-low"};
+  if(v<=max)   return {text:"OK",cls:"tag-ok"};
+  return {text:"Alta",cls:"tag-high"};
+}
+
+/* =============================================================
+   CALCOLO
+============================================================= */
+function calcola(){
+  const Q_raw = parseFloat(byId("flow").value);
+  let Q = (!isNaN(Q_raw) && Q_raw>0) ? Q_raw : null;
+
+  const V_raw = parseFloat(byId("velocity").value);
+  const V_in = (!isNaN(V_raw) && V_raw>0) ? V_raw : null;
+
+  const geom = byId("geom").value;
+  const scen = scenarios[byId("scenario").value];
+
+  if(!Q && !V_in){
+    alert("Inserisci almeno Portata Q oppure Velocità V > 0");
+    return;
+  }
+
+  let A = null;
+  let v = null;
+
+  byId("circOut").style.display="none";
+  byId("rectSquareRow").style.display="none";
+  byId("suggestCard").style.display="none";
+
+  /* ===================== RETTANGOLARE ===================== */
+  if(geom==="rect"){
+    const bMm = parseFloat(byId("base").value);
+    const hMm = parseFloat(byId("height").value);
+    let b = (!isNaN(bMm) && bMm>0) ? bMm/1000 : null;
+    let h = (!isNaN(hMm) && hMm>0) ? hMm/1000 : null;
+
+    if(Q){
+      const Qs_tmp = Q/3600;
+
+      if(V_in){
+        A = Qs_tmp / V_in;
+        v = V_in;
+
+        if(b && !h){
+          h = A/b;
+          byId("height").value = round(h*1000,1);
+        } else if(!b && h){
+          b = A/h;
+          byId("base").value = round(b*1000,1);
+        } else if(!b && !h){
+          const side = Math.sqrt(A)*1000;
+          byId("rectSquareRow").style.display="";
+          byId("rectSquareOut").textContent = round(side,1)+" mm";
+        } else {
+          A = b*h;
+          v = Qs_tmp / A;
+        }
+
+      } else {
+        if(!b || !h){
+          alert("Se la velocità non è nota, inserisci base e altezza.");
+          return;
+        }
+        A = b*h;
+        v = Qs_tmp / A;
+      }
+
+    } else {
+      if(!V_in){
+        alert("Se la portata non è nota, inserisci una velocità V > 0");
+        return;
+      }
+      if(!b || !h){
+        alert("Se la portata non è nota, inserisci base e altezza.");
+        return;
+      }
+      A = b*h;
+      v = V_in;
+    }
+  }
+
+  /* ===================== CIRCOLARE ===================== */
+  if(geom==="circ"){
+    let dMm = parseFloat(byId("diam").value);
+    let d   = (!isNaN(dMm) && dMm>0) ? dMm/1000 : null;
+
+    if(Q){
+      const Qs_tmp = Q/3600;
+
+      if(V_in){
+
+        if(!d){
+          const Aideal = Qs_tmp / V_in;
+          const Deq = Math.sqrt(4*Aideal/Math.PI)*1000;
+
+          let best = null, m = 1e9;
+          for(const dn of stdDiameters){
+            const diff = Math.abs(dn - Deq);
+            if(diff < m){ m=diff; best=dn; }
+          }
+
+          if(best){
+            byId("diam").value = best;
+            dMm = best;
+            d   = best/1000;
+          }
+        }
+
+        if(!d){
+          A = Qs_tmp / V_in;
+          v = V_in;
+        } else {
+          A = Math.PI*d*d/4;
+          v = Qs_tmp / A;
+        }
+
+      } else {
+        if(!d){
+          alert("Se la velocità non è nota, inserisci diametro.");
+          return;
+        }
+        A = Math.PI*d*d/4;
+        v = Qs_tmp / A;
+      }
+
+    } else {
+      if(!V_in){
+        alert("Se la portata non è nota, inserisci V.");
+        return;
+      }
+      if(!d){
+        alert("Se la portata non è nota, inserisci diametro.");
+        return;
+      }
+      A = Math.PI*d*d/4;
+      v = V_in;
+    }
+
+    byId("circOut").style.display="";
+    byId("squareSideOut").textContent = round(Math.sqrt(A)*1000,1)+" mm";
+  }
+
+  if(!A || !v){
+    alert("Errore.");
+    return;
+  }
+
+  let Qs;
+  if(Q && Q>0){
+    Qs = Q/3600;
+  } else {
+    Qs = v*A;
+    Q  = Qs*3600;
+    byId("flow").value = Math.round(Q);
+  }
+
+  /* ===================== RISULTATI GENERALI ===================== */
+  byId("areaOut").textContent =
+    round(A,4)+" m² ("+round(A*1e6,0)+" mm²)";
+  byId("vEffOut").textContent = round(v,2)+" m/s";
+
+  const tag = getTag(v,scen.vMin,scen.vMax);
+  byId("vEffTag").textContent = tag.text;
+  byId("vEffTag").className = "tag "+tag.cls;
+
+  /* Ø STANDARD rettangolare */
+  if(geom==="rect"){
+    const Deq = Math.sqrt(4*A/Math.PI)*1000;
+    let best = null, m = 1e9;
+    for(const dn of stdDiameters){
+      if(Math.abs(dn-Deq)<m){m=Math.abs(dn-Deq);best=dn;}
+    }
+
+    if(best){
+      byId("stdDNOut").textContent = "Ø "+best+" mm";
+      byId("stdDNVOut").textContent =
+        round(Qs/(Math.PI*(best/1000)**2/4),2)+" m/s";
+    } else {
+      byId("stdDNOut").textContent  = "—";
+      byId("stdDNVOut").textContent = "—";
+    }
+  } else {
+    byId("stdDNOut").textContent  = "—";
+    byId("stdDNVOut").textContent = "—";
+  }
+
+  /* SUGGERIMENTO */
+  if(scen.vMax!=null && v>scen.vMax){
+    const vT = (scen.vMin+scen.vMax)/2;
+    const Anew = Qs/vT;
+
+    const L = Math.sqrt(Anew)*1000;
+
+    let best = null, m = 1e9;
+    const DeqNew = Math.sqrt(4*Anew/Math.PI)*1000;
+    for(const dn of stdDiameters){
+      const diff = Math.abs(dn - DeqNew);
+      if(diff < m){
+        m = diff;
+        best = dn;
+      }
+    }
+
+    byId("suggText").textContent =
+      "Velocità alta → sezione consigliata: "+
+      round(L,1)+" × "+round(L,1)+
+      " mm oppure Ø "+best+" mm.";
+
+    byId("suggestCard").style.display="";
+  }
+
+  setTimeout(()=>{
+    byId("resultsCard").scrollIntoView({behavior:"smooth",block:"start"});
+  },120);
+}
+</script>
+
 </body>
 </html>
