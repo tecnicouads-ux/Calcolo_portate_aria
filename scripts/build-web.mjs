@@ -43,6 +43,22 @@ if (!headerPattern.test(html)) {
 }
 
 html = html.replace(headerPattern, newHeader);
+
+const privacyFooter = `
+<div style="text-align:center; padding:18px 12px 28px; font-size:13px;">
+  <a href="https://tecnicouads-ux.github.io/Calcolo_portate_aria/privacy.html"
+     target="_blank"
+     rel="noopener noreferrer"
+     style="color:#2A6EBB; text-decoration:underline;">Privacy Policy</a>
+</div>
+`;
+
+const scriptMarker = '<!-- ===================== SCRIPT ===================== -->';
+if (!html.includes(scriptMarker)) {
+  throw new Error('Punto di inserimento Privacy Policy non trovato.');
+}
+html = html.replace(scriptMarker, privacyFooter + '\n' + scriptMarker);
+
 await writeFile(androidIndexPath, html, 'utf8');
 
-console.log('Web assets Android creati in www con icona app e header senza link ADS');
+console.log('Web assets Android creati con icona app, header pulito e Privacy Policy');
