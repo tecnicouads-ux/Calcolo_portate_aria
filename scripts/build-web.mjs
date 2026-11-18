@@ -44,6 +44,53 @@ if (!headerPattern.test(html)) {
 
 html = html.replace(headerPattern, newHeader);
 
+
+const calcButton = "<button class=\"btn-primary\" onclick=\"calcola()\">Calcola</button>";
+if (!html.includes(calcButton)) {
+  throw new Error('Pulsante Calcola non trovato.');
+}
+html = html.replace(calcButton, "<button class=\"btn-primary\" onclick=\"calcola()\">Calcola</button>\n  <button type=\"button\" onclick=\"resetCampi()\"\n    style=\"width:100%; padding:11px; border-radius:999px; font-size:15px; font-weight:700; background:#ffffff; color:#2A6EBB; border:1px solid #2A6EBB; margin-top:10px;\">\n    Reset\n  </button>");
+
+const calcFunctionMarker = 'function calcola(){';
+const resetFunction = `function resetCampi(){
+  document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.value = '';
+  });
+
+  const outputs = ['areaOut','vEffOut','stdDNOut','stdDNVOut','rectSquareOut','squareSideOut'];
+  outputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '—';
+  });
+
+  const tag = document.getElementById('vEffTag');
+  if (tag) {
+    tag.textContent = 'n/d';
+    tag.className = 'tag tag-na';
+  }
+
+  const circOut = document.getElementById('circOut');
+  const rectSquareRow = document.getElementById('rectSquareRow');
+  const suggestCard = document.getElementById('suggestCard');
+
+  if (circOut) circOut.style.display = 'none';
+  if (rectSquareRow) rectSquareRow.style.display = 'none';
+  if (suggestCard) suggestCard.style.display = 'none';
+
+  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function calcola(){`;
+
+if (!html.includes(calcFunctionMarker)) {
+  throw new Error('Funzione calcola non trovata.');
+}
+html = html.replace(calcFunctionMarker, resetFunction);
+
 const privacyFooter = `
 <div style="text-align:center; padding:18px 12px 28px; font-size:13px;">
   <a href="https://tecnicouads-ux.github.io/Calcolo_portate_aria/privacy.html"
